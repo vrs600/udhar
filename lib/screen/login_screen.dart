@@ -43,7 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextFormField(
                   controller: mobileNoTEC,
                   keyboardType: TextInputType.phone,
-                  decoration: Styling.getTFFInputDecoration(),
+                  decoration:
+                      Styling.getTFFInputDecoration(label: 'Mobile No.'),
                 ),
               ),
               ElevatedButton.icon(
@@ -89,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextFormField(
             controller: otpTEC,
             keyboardType: TextInputType.phone,
-            decoration: Styling.getTFFInputDecoration(),
+            decoration: Styling.getTFFInputDecoration(label: 'OTP'),
           ),
         ),
         actions: [

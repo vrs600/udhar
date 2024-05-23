@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Styling {
-  static InputDecoration getTFFInputDecoration() {
+  static InputDecoration getTFFInputDecoration(
+      {required String label, Icon? prefixIcon}) {
     double border = 10;
     return InputDecoration(
-      labelText: 'Mobile No.',
+      prefixIcon: prefixIcon,
+      labelText: label,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(border),
       ),

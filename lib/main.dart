@@ -13,7 +13,7 @@ Future<void> main() async {
     MaterialApp(
       debugShowCheckedModeBanner: false,
       home: const BtmNavScreen(),
-      theme: ThemeData(useMaterial3: false, fontFamily: ""),
+      theme: ThemeData(useMaterial3: false, fontFamily: "Poppins"),
     ),
   );
 }
