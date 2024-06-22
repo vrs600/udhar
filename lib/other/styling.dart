@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 
 class Styling {
-  static InputDecoration getTFFInputDecoration(
+  static double borderRadius = 10;
+  InputDecoration getTFFInputDecoration(
       {required String label, Icon? prefixIcon}) {
-    double border = 10;
     return InputDecoration(
-      prefixIcon: prefixIcon,
+      filled: true,
       labelText: label,
+      prefixIcon: prefixIcon,
+      fillColor: Colors.grey[300],
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(border),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(border),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(border),
+        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(10),
       ),
     );
   }
 
-  static ButtonStyle getElevatedIconButtonStyle() {
-    return ButtonStyle();
+  ButtonStyle getElevatedIconButtonStyle() {
+    return const ButtonStyle();
   }
 }

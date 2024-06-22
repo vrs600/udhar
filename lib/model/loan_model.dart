@@ -5,8 +5,9 @@ class LoanModel {
   String loanCreationTime;
   double loanAmount;
   String lenderMobileNo;
-  int durationInMonth;
+  String dueDate;
   String note;
+  String status;
 
   LoanModel(
       this.loanId,
@@ -15,6 +16,7 @@ class LoanModel {
       this.loanCreationTime,
       this.loanAmount,
       this.lenderMobileNo,
-      this.durationInMonth,
-      this.note);
+      this.dueDate,
+      this.note,
+      this.status);
 }

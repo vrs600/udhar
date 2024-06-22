@@ -22,14 +22,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ListTile(
-              onTap: () => _onLogOutSelected(),
-              leading: const Icon(Icons.logout_rounded),
-              title: const Text(
-                "Log Out",
-                style: TextStyle(fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.all(2),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                child: ListTile(
+                  onTap: () => _onLogOutSelected(),
+                  leading: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.logout_rounded,
+                      color: Colors.black,
+                    ),
+                  ),
+                  title: const Text(
+                    "Log Out",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text("Log out from Udhar App"),
+                ),
               ),
-              subtitle: const Text("Log out from Udhar App"),
             )
           ],
         ),

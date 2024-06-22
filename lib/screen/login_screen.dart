@@ -15,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController otpTEC = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? _user;
+  Styling styling = Styling();
 
   @override
   void initState() {
@@ -44,14 +45,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: mobileNoTEC,
                   keyboardType: TextInputType.phone,
                   decoration:
-                      Styling.getTFFInputDecoration(label: 'Mobile No.'),
+                      styling.getTFFInputDecoration(label: 'Mobile No.'),
                 ),
               ),
               ElevatedButton.icon(
                 onPressed: () => onVerifyButtonPressed(),
                 icon: const Icon(Icons.done_rounded),
                 label: const Text("Send OTP"),
-                style: Styling.getElevatedIconButtonStyle(),
+                style: styling.getElevatedIconButtonStyle(),
               )
             ],
           ),
@@ -90,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextFormField(
             controller: otpTEC,
             keyboardType: TextInputType.phone,
-            decoration: Styling.getTFFInputDecoration(label: 'OTP'),
+            decoration: styling.getTFFInputDecoration(label: 'OTP'),
           ),
         ),
         actions: [
@@ -98,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () => verifyEnteredOTP(verificationId, resendToken),
             icon: const Icon(Icons.done_rounded),
             label: const Text("Verify"),
-            style: Styling.getElevatedIconButtonStyle(),
+            style: styling.getElevatedIconButtonStyle(),
           )
         ],
       ),
