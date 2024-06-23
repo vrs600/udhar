@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -11,6 +12,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  Styling styling = Styling();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.all(2),
               child: Card(
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                  borderRadius: BorderRadius.circular(styling.borderRadius),
+                ),
                 child: ListTile(
                   onTap: () => _onLogOutSelected(),
                   leading: IconButton(
@@ -41,6 +44,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: const Text("Log out from Udhar App"),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(2),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(styling.borderRadius),
+                ),
+                child: ListTile(
+                  onTap: () => _onAppInfoClicked(),
+                  leading: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.info_outline_rounded,
+                      color: Colors.black,
+                    ),
+                  ),
+                  title: const Text(
+                    "About App",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text("Vision, Terms & Conditions, App Info"),
                 ),
               ),
             )
@@ -83,4 +109,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+  _onAppInfoClicked() {}
 }

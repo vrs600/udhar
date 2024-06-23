@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 class Styling {
-  static double borderRadius = 10;
-  InputDecoration getTFFInputDecoration(
-      {required String label, Icon? prefixIcon}) {
+  double borderRadius = 10;
+  InputDecoration getTFFInputDecoration({
+    required String label,
+    Icon? prefixIcon,
+    TextEditingController? textEditingController,
+  }) {
     return InputDecoration(
       filled: true,
       labelText: label,
@@ -11,7 +14,7 @@ class Styling {
       fillColor: Colors.grey[300],
       border: OutlineInputBorder(
         borderSide: BorderSide.none,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
     );
   }

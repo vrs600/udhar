@@ -26,6 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<LoanModel> loanListCopy = [];
   bool _showClearSearchInputIcon = false;
 
+  TextEditingController searchTEC = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: TextFormField(
+                        maxLines: 1,
+                        controller: searchTEC,
                         onChanged: (searchQuery) {
                           setState(() {
                             _loanModelList = loanListCopy.where((loanItem) {
