@@ -2,12 +2,22 @@ import 'package:flutter/material.dart';
 
 class Styling {
   double borderRadius = 10;
+
   InputDecoration getTFFInputDecoration({
     required String label,
     Icon? prefixIcon,
     TextEditingController? textEditingController,
   }) {
     return InputDecoration(
+      suffixIcon: (textEditingController != null &&
+              textEditingController.text.isNotEmpty)
+          ? IconButton(
+              onPressed: () {
+                textEditingController.text = "";
+              },
+              icon: const Icon(Icons.close_rounded),
+            )
+          : null,
       filled: true,
       labelText: label,
       prefixIcon: prefixIcon,

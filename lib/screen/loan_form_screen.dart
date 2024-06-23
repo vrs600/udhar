@@ -1,17 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/dummy_values_generator.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/service/loan_service.dart';
 
-class CreateLoanScreen extends StatefulWidget {
-  const CreateLoanScreen({super.key});
+class LoanFormScreen extends StatefulWidget {
+  final LoanModel? loanModel;
+
+  const LoanFormScreen(this.loanModel, {super.key});
 
   @override
-  State<CreateLoanScreen> createState() => _CreateLoanScreenState();
+  State<LoanFormScreen> createState() => _LoanFormScreenState();
 }
 
-class _CreateLoanScreenState extends State<CreateLoanScreen> {
+class _LoanFormScreenState extends State<LoanFormScreen> {
   final TextEditingController _dueDateTEC = TextEditingController();
   final TextEditingController _loanAmountTEC = TextEditingController();
   final TextEditingController _mobileNoTEC = TextEditingController();
@@ -19,13 +22,26 @@ class _CreateLoanScreenState extends State<CreateLoanScreen> {
 
   final _loanFormKey = GlobalKey<FormState>();
   Styling styling = Styling();
+  LoanModel? loan;
+  bool editLoan = false;
+  LoanService? _loanService;
 
   @override
   void initState() {
     super.initState();
+    loan = widget.loanModel;
+    editLoan = (loan == null) ? false : true;
     if (kDebugMode) {
       // entering dummy values in the text fields
-      fillDummyValues();
+      if (loan == null) {
+        fillDummyValues();
+      } else {
+        _loanService = LoanService(loan!.borrowerMobileNo, context);
+        fillLoanValues();
+      }
+    }
+    if (loan != null) {
+      // user want to edit the loan details
     }
   }
 
@@ -35,7 +51,9 @@ class _CreateLoanScreenState extends State<CreateLoanScreen> {
       appBar: AppBar(
         backgroundColor: null,
         automaticallyImplyLeading: false,
-        title: const Text("Create a Loan"),
+        title: (editLoan)
+            ? const Text("Edit the Loan")
+            : const Text("Create a Loan"),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -45,6 +63,17 @@ class _CreateLoanScreenState extends State<CreateLoanScreen> {
               onPopInvoked: (didPop) {},
               child: Column(
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: (editLoan)
+                        ? Text(
+                            loan!.loanId,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : null,
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
@@ -97,11 +126,33 @@ class _CreateLoanScreenState extends State<CreateLoanScreen> {
                 ],
               ),
             ),
-            ElevatedButton.icon(
-              onPressed: () => _validateForm(),
-              icon: const Icon(Icons.done_rounded),
-              label: const Text("Create Loan"),
-            )
+            (editLoan)
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton.icon(
+                          onPressed: () => _closeCurrentLoan(),
+                          icon: const Icon(Icons.done_rounded),
+                          label: const Text("Close"),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton.icon(
+                          onPressed: () => _validateForm(),
+                          icon: const Icon(Icons.edit_rounded),
+                          label: const Text("Update"),
+                        ),
+                      )
+                    ],
+                  )
+                : ElevatedButton.icon(
+                    onPressed: () => _validateForm(),
+                    icon: const Icon(Icons.done_rounded),
+                    label: const Text("Create Loan"),
+                  )
           ],
         ),
       ),
@@ -186,5 +237,39 @@ class _CreateLoanScreenState extends State<CreateLoanScreen> {
     _dueDateTEC.text = dummyValueGenerator.generateRandomDate().toString();
     _noteTEC.text =
         dummyValueGenerator.generateRandomNote(minCharCount: 50).toString();
+  }
+
+  void fillLoanValues() {
+    _dueDateTEC.text = loan!.dueDate;
+    _loanAmountTEC.text = loan!.loanAmount.toString();
+    _mobileNoTEC.text = loan!.borrowerMobileNo;
+    _noteTEC.text = loan!.note;
+  }
+
+  _closeCurrentLoan() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Close Loan"),
+        content:
+            const Text("Are you sure that you want to close current loan?"),
+        actions: [
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.close_rounded),
+            label: const Text("Cancel"),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              _loanService!.closeLoan();
+            },
+            icon: const Icon(Icons.done_rounded),
+            label: const Text("Yes"),
+          )
+        ],
+      ),
+    );
   }
 }

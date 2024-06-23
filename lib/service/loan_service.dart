@@ -45,8 +45,8 @@ class LoanService {
 
     if (_auth.currentUser != null) {
       String? currentUserMobileNo = _auth.currentUser!.phoneNumber;
-      DatabaseReference loanLedgerRef = _firebaseDatabase
-          .ref("app/ledger/$currentUserMobileNo/$_loanId/loan_info");
+      DatabaseReference loanLedgerRef =
+          _firebaseDatabase.ref("app/ledger/$_loanId/loan_info");
       loanLedgerRef.set({
         "loan_id": loanModel.loanId,
         "borrower_mobile_no": loanModel.borrowerMobileNo,
@@ -69,9 +69,10 @@ class LoanService {
                 : "Can't create your at this moment. Please try again later."),
             actions: [
               ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.done_rounded),
-                  label: const Text("Okay"))
+                onPressed: () {},
+                icon: const Icon(Icons.done_rounded),
+                label: const Text("Okay"),
+              )
             ],
           ),
         );
