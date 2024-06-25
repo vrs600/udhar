@@ -13,7 +13,7 @@ class BtmNavScreen extends StatefulWidget {
 class _BtmNavScreenState extends State<BtmNavScreen> {
   int _selectedIndex = 0;
 
-  List screens = [
+  final List _screens = [
     const HomeScreen(),
     const SearchScreen(),
     const SettingsScreen(),
@@ -34,7 +34,7 @@ class _BtmNavScreenState extends State<BtmNavScreen> {
       },
       child: Scaffold(
         body: Center(
-          child: screens.elementAt(_selectedIndex),
+          child: _screens.elementAt(_selectedIndex),
         ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[

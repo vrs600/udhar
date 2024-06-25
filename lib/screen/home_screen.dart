@@ -6,8 +6,6 @@ import 'package:readmore/readmore.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/loan_form_screen.dart';
-import 'package:udhar/screen/loan_detail_screen.dart';
-import 'package:udhar/service/loan_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,16 +16,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<LoanModel> _loanModelList = [];
-  final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  List<LoanModel> _loanModelListCopy = [];
   bool _showProgressIndicator = true;
   Styling styling = Styling();
   int? chipSelectedIndex = 0;
-  final List<String> _loanStatusList = ["all", "pending", "completed"];
-  List<LoanModel> loanListCopy = [];
-  bool _showClearSearchInputIcon = false;
   String? _currentUserPhoneNo = "";
-  TextEditingController searchTEC = TextEditingController();
+  final List<String> _loanStatusList = ["all", "pending", "completed"];
+  final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _searchTEC = TextEditingController();
 
   @override
   void initState() {
@@ -142,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
         }
-        loanListCopy = _loanModelList;
+        _loanModelListCopy = _loanModelList;
 
         _showProgressIndicator = false;
       });
@@ -182,13 +179,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 chipSelectedIndex = selected ? index : null;
 
                 if (chipSelectedIndex == 0) {
-                  _loanModelList = loanListCopy;
+                  _loanModelList = _loanModelListCopy;
                 } else if (chipSelectedIndex == 1) {
-                  _loanModelList = loanListCopy.where((loanItem) {
+                  _loanModelList = _loanModelListCopy.where((loanItem) {
                     return loanItem.status == "pending";
                   }).toList();
                 } else if (chipSelectedIndex == 2) {
-                  _loanModelList = loanListCopy.where((loanItem) {
+                  _loanModelList = _loanModelListCopy.where((loanItem) {
                     return loanItem.status == "completed";
                   }).toList();
                 }
@@ -275,10 +272,10 @@ class _HomeScreenState extends State<HomeScreen> {
   _searchBox() {
     return TextFormField(
       maxLines: 1,
-      controller: searchTEC,
+      controller: _searchTEC,
       onChanged: (searchQuery) {
         setState(() {
-          _loanModelList = loanListCopy.where((loanItem) {
+          _loanModelList = _loanModelListCopy.where((loanItem) {
             return loanItem.borrowerMobileNo.contains(searchQuery);
           }).toList();
         });
@@ -287,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: styling.getTFFInputDecoration(
         label: "Search",
         prefixIcon: const Icon(Icons.search_rounded),
-        textEditingController: searchTEC,
+        textEditingController: _searchTEC,
       ),
     );
   }

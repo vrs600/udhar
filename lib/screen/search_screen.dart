@@ -3,10 +3,9 @@ import 'dart:ui';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:readmore/readmore.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
+import 'package:udhar/screen/loan_detail_screen.dart';
 import 'package:udhar/screen/loan_form_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -17,15 +16,14 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  Styling styling = Styling();
-
-  TextEditingController searchPeopleTEC = TextEditingController();
-  bool _showProgressIndicator = true;
   List<LoanModel> _loanModelList = [];
-  final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
+  List<LoanModel> _loanModelListCopy = [];
+  Styling styling = Styling();
+  bool _showProgressIndicator = true;
   int? chipSelectedIndex = 0;
-  List<LoanModel> loanListCopy = [];
-  TextEditingController searchTEC = TextEditingController();
+  final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
+  final TextEditingController _searchPeopleTEC = TextEditingController();
+  final TextEditingController _otpTEC = TextEditingController();
 
   @override
   void initState() {
@@ -46,25 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   padding: const EdgeInsets.all(2.0),
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: TextFormField(
-                      keyboardType: TextInputType.phone,
-                      onFieldSubmitted: (value) {},
-                      controller: searchPeopleTEC,
-                      onChanged: (searchQuery) {
-                        // here search query is the phone no.
-                        setState(() {
-                          _loanModelList = loanListCopy.where((loanItem) {
-                            return loanItem.borrowerMobileNo
-                                .contains(searchQuery);
-                          }).toList();
-                        });
-                      },
-                      minLines: 1,
-                      decoration: styling.getTFFInputDecoration(
-                        label: "Search People by mobile no.",
-                        prefixIcon: const Icon(Icons.search_rounded),
-                      ),
-                    ),
+                    child: _searchBox(),
                   ),
                 ),
               ),
@@ -129,7 +109,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           );
         }
-        loanListCopy = _loanModelList;
+        _loanModelListCopy = _loanModelList;
 
         _showProgressIndicator = false;
       });
@@ -217,8 +197,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                     OutlinedButton(
-                      onPressed: () {},
-                      child: const Text("View"),
+                      onPressed: () => _onViewReportButtonClicked(index),
+                      child: const Text("View Report"),
                     )
                   ],
                 ),
@@ -226,6 +206,82 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  _searchBox() {
+    return TextFormField(
+      keyboardType: TextInputType.phone,
+      controller: _searchPeopleTEC,
+      onChanged: (searchQuery) {
+        // here search query is the phone no.
+        setState(() {
+          _loanModelList = _loanModelListCopy.where((loanItem) {
+            return loanItem.borrowerMobileNo.contains(searchQuery);
+          }).toList();
+        });
+      },
+      minLines: 1,
+      decoration: styling.getTFFInputDecoration(
+        label: "Search People by mobile no.",
+        textEditingController: _searchPeopleTEC,
+        prefixIcon: const Icon(Icons.search_rounded),
+      ),
+    );
+  }
+
+  _onViewReportButtonClicked(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("OTP Verification"),
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: Text(
+                    "Enter the OTP  sent to ${_loanModelList[index].borrowerMobileNo} to get permission to view full report"),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: TextFormField(
+                  controller: _otpTEC,
+                  decoration: styling.getTFFInputDecoration(
+                    label: "OTP",
+                    prefixIcon: const Icon(Icons.password_rounded),
+                    textEditingController: _otpTEC,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (kDebugMode) {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoanDetailScreen(
+                      _loanModelList[index],
+                    ),
+                  ),
+                );
+              }
+            },
+            child: const Text("Verify"),
+          )
+        ],
       ),
     );
   }

@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:udhar/firebase_options.dart';
-import 'package:udhar/screen/btm_nav_screen.dart';
+import 'package:udhar/screen/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +11,7 @@ void main() async {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const BtmNavScreen(),
+      home: const LoginScreen(),
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: "Poppins",

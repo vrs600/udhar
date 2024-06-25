@@ -21,26 +21,26 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
   final TextEditingController _noteTEC = TextEditingController();
 
   final _loanFormKey = GlobalKey<FormState>();
-  Styling styling = Styling();
-  LoanModel? loan;
-  bool editLoan = false;
+  final Styling _styling = Styling();
+  LoanModel? _loan;
+  bool _editLoan = false;
   LoanService? _loanService;
 
   @override
   void initState() {
     super.initState();
-    loan = widget.loanModel;
-    editLoan = (loan == null) ? false : true;
+    _loan = widget.loanModel;
+    _editLoan = (_loan == null) ? false : true;
     if (kDebugMode) {
       // entering dummy values in the text fields
-      if (loan == null) {
+      if (_loan == null) {
         fillDummyValues();
       } else {
-        _loanService = LoanService(loan!.borrowerMobileNo, context);
+        _loanService = LoanService(_loan!.borrowerMobileNo, context);
         fillLoanValues();
       }
     }
-    if (loan != null) {
+    if (_loan != null) {
       // user want to edit the loan details
     }
   }
@@ -51,7 +51,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
       appBar: AppBar(
         backgroundColor: null,
         automaticallyImplyLeading: false,
-        title: (editLoan)
+        title: (_editLoan)
             ? const Text("Edit the Loan")
             : const Text("Create a Loan"),
       ),
@@ -65,9 +65,9 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: (editLoan)
+                    child: (_editLoan)
                         ? Text(
-                            loan!.loanId,
+                            _loan!.loanId,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -79,8 +79,9 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                     child: TextFormField(
                       validator: (value) => _validateMobileNo(value),
                       controller: _mobileNoTEC,
+                      enabled: (_editLoan) ? false : true,
                       keyboardType: TextInputType.phone,
-                      decoration: styling.getTFFInputDecoration(
+                      decoration: _styling.getTFFInputDecoration(
                         label: 'Borrower Mobile No.',
                         prefixIcon: const Icon(Icons.phone_rounded),
                       ),
@@ -92,7 +93,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       validator: (value) => _loanValidator(value),
                       controller: _loanAmountTEC,
                       keyboardType: TextInputType.number,
-                      decoration: styling.getTFFInputDecoration(
+                      decoration: _styling.getTFFInputDecoration(
                         label: 'Loan Amount',
                         prefixIcon: const Icon(Icons.currency_rupee_rounded),
                       ),
@@ -106,7 +107,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       controller: _dueDateTEC,
                       readOnly: true,
                       keyboardType: TextInputType.datetime,
-                      decoration: styling.getTFFInputDecoration(
+                      decoration: _styling.getTFFInputDecoration(
                         label: 'Due Date',
                         prefixIcon: const Icon(Icons.calendar_month_rounded),
                       ),
@@ -118,7 +119,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       controller: _noteTEC,
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
-                      decoration: styling.getTFFInputDecoration(
+                      decoration: _styling.getTFFInputDecoration(
                         label: 'Note',
                       ),
                     ),
@@ -126,7 +127,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                 ],
               ),
             ),
-            (editLoan)
+            (_editLoan)
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -240,10 +241,10 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
   }
 
   void fillLoanValues() {
-    _dueDateTEC.text = loan!.dueDate;
-    _loanAmountTEC.text = loan!.loanAmount.toString();
-    _mobileNoTEC.text = loan!.borrowerMobileNo;
-    _noteTEC.text = loan!.note;
+    _dueDateTEC.text = _loan!.dueDate;
+    _loanAmountTEC.text = _loan!.loanAmount.toString();
+    _mobileNoTEC.text = _loan!.borrowerMobileNo;
+    _noteTEC.text = _loan!.note;
   }
 
   _closeCurrentLoan() {
