@@ -1,4 +1,6 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/btm_nav_screen.dart';
@@ -11,11 +13,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController mobileNoTEC = TextEditingController();
-  TextEditingController otpTEC = TextEditingController();
+  final TextEditingController _mobileNoTEC = TextEditingController();
+  final TextEditingController _otpTEC = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final Styling _styling = Styling();
   User? _user;
-  Styling styling = Styling();
+  String countryCode = "+91";
 
   @override
   void initState() {
@@ -35,24 +38,69 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
+      appBar: AppBar(
+        leading: const Icon(Icons.login_rounded),
+        automaticallyImplyLeading: false,
+        title: const Text(
+          "Login",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
           child: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
+                child: Image.asset("lib/asset/image/ic_launcher.png"),
+              ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Udhar",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 38,
+                  ),
+                ),
+              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: CountryCodePicker(
+              //     onChanged: (countryCode) {
+              //       if (kDebugMode) {
+              //         print("Country Code : ${countryCode.dialCode}");
+              //       }
+              //     },
+              //     // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
+              //     initialSelection: 'IN',
+              //     // optional. Shows only country name and flag
+              //     showCountryOnly: false,
+              //     // optional. Shows only country name and flag when popup is closed.
+              //     showOnlyCountryWhenClosed: false,
+              //     // optional. aligns the flag and the Text left
+              //     alignLeft: false,
+              //   ),
+              // ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: mobileNoTEC,
+                  controller: _mobileNoTEC,
                   keyboardType: TextInputType.phone,
-                  decoration:
-                      styling.getTFFInputDecoration(label: 'Mobile No.'),
+                  decoration: _styling.getTFFInputDecoration(
+                    label: 'Mobile No.',
+                    textEditingController: _mobileNoTEC,
+                    prefixIcon: const Icon(Icons.phone_rounded),
+                  ),
                 ),
               ),
               ElevatedButton.icon(
                 onPressed: () => onVerifyButtonPressed(),
                 icon: const Icon(Icons.done_rounded),
                 label: const Text("Send OTP"),
-                style: styling.getElevatedIconButtonStyle(),
+                style: _styling.getElevatedIconButtonStyle(),
               )
             ],
           ),
@@ -63,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   verifyMobileNo() async {
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: mobileNoTEC.text,
+      phoneNumber: _mobileNoTEC.text,
       verificationCompleted: (PhoneAuthCredential credential) {},
       verificationFailed: (FirebaseAuthException e) {},
       codeSent: (String verificationId, int? resendToken) {
@@ -74,14 +122,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   onVerifyButtonPressed() {
-    if (mobileNoTEC.text.isNotEmpty) {
+    if (_mobileNoTEC.text.isNotEmpty) {
       verifyMobileNo();
     }
   }
 
   void onOtpSent(String verificationId, int? resendToken) {
     // clearing the test form field
-    otpTEC.text = "";
+    _otpTEC.text = "";
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -89,9 +137,9 @@ class _LoginScreenState extends State<LoginScreen> {
         content: Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
-            controller: otpTEC,
+            controller: _otpTEC,
             keyboardType: TextInputType.phone,
-            decoration: styling.getTFFInputDecoration(label: 'OTP'),
+            decoration: _styling.getTFFInputDecoration(label: 'OTP'),
           ),
         ),
         actions: [
@@ -99,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () => verifyEnteredOTP(verificationId, resendToken),
             icon: const Icon(Icons.done_rounded),
             label: const Text("Verify"),
-            style: styling.getElevatedIconButtonStyle(),
+            style: _styling.getElevatedIconButtonStyle(),
           )
         ],
       ),
@@ -108,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   verifyEnteredOTP(String verificationId, int? resendToken) async {
     // Update the UI - wait for the user to enter the SMS code
-    String smsCode = otpTEC.text;
+    String smsCode = _otpTEC.text;
 
     // Create a PhoneAuthCredential with the code
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
