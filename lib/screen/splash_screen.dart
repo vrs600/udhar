@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:udhar/screen/btm_nav_screen.dart';
+import 'package:udhar/screen/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -9,18 +11,31 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  User? _user;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   void initState() {
     super.initState();
+    _user = _auth.currentUser;
     Future.delayed(
       const Duration(seconds: 3),
     ).then((value) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const BtmNavScreen(),
-        ),
-      );
+      if (_user == null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
+          ),
+        );
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const BtmNavScreen(),
+          ),
+        );
+      }
     });
   }
 
