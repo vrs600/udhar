@@ -52,8 +52,18 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
         backgroundColor: null,
         automaticallyImplyLeading: false,
         title: (_editLoan)
-            ? const Text("Edit the Loan")
-            : const Text("Create a Loan"),
+            ? const Text(
+                "Edit the Loan",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : const Text(
+                "Create a Loan",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
       body: SingleChildScrollView(
         child: Column(

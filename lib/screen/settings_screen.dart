@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:udhar/other/styling.dart';
+import 'package:udhar/screen/about_app_screen.dart';
 import 'package:udhar/screen/login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -12,62 +13,85 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  Styling styling = Styling();
+  final Styling _styling = Styling();
+
+  final TextEditingController _phoneNoTEC = TextEditingController();
+  User? _user;
+  String _currentUserPhoneNo = "";
+  @override
+  void initState() {
+    super.initState();
+    _user = _auth.currentUser;
+    _currentUserPhoneNo = _user!.phoneNumber!;
+    _phoneNoTEC.text = _currentUserPhoneNo;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: const Icon(Icons.settings_rounded),
         automaticallyImplyLeading: false,
-        title: const Text("Settings"),
+        title: const Text(
+          "Settings",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(2),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(styling.borderRadius),
-                ),
-                child: ListTile(
-                  onTap: () => _onLogOutSelected(),
-                  leading: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.logout_rounded,
-                      color: Colors.black,
-                    ),
-                  ),
-                  title: const Text(
-                    "Log Out",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: const Text("Log out from Udhar App"),
+            SizedBox(
+              height: 70,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: _searchBox(),
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(2),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(styling.borderRadius),
-                ),
-                child: ListTile(
-                  onTap: () => _onAppInfoClicked(),
-                  leading: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.info_outline_rounded,
-                      color: Colors.black,
-                    ),
+              child: ListTile(
+                onTap: () => _onLogOutSelected(),
+                leading: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.logout_rounded,
+                    color: Colors.black,
                   ),
-                  title: const Text(
-                    "About App",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: const Text("Vision, Terms & Conditions, App Info"),
                 ),
+                title: const Text(
+                  "Log Out",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text("Log out from Udhar App"),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(2),
+              child: ListTile(
+                onTap: () => _onAppInfoClicked(),
+                leading: IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutAppScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.info_outline_rounded,
+                    color: Colors.black,
+                  ),
+                ),
+                title: const Text(
+                  "About App",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text("Vision & App Info"),
               ),
             )
           ],
@@ -110,5 +134,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  _onAppInfoClicked() {}
+  _onAppInfoClicked() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AboutAppScreen(),
+      ),
+    );
+  }
+
+  _searchBox() {
+    return TextFormField(
+      keyboardType: TextInputType.phone,
+      controller: _phoneNoTEC,
+      onChanged: (searchQuery) {
+        // here search query is the phone no.
+      },
+      minLines: 1,
+      decoration: _styling.getTFFInputDecoration(
+        label: "Your Phone No.",
+        prefixIcon: const Icon(Icons.phone_rounded),
+      ),
+    );
+  }
 }

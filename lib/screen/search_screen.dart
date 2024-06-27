@@ -34,6 +34,16 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: const Icon(Icons.search_rounded),
+        automaticallyImplyLeading: false,
+        title: const Text(
+          "Search",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -41,11 +51,8 @@ class _SearchScreenState extends State<SearchScreen> {
               height: 70,
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: _searchBox(),
-                  ),
+                  padding: const EdgeInsets.all(4.0),
+                  child: _searchBox(),
                 ),
               ),
             ),

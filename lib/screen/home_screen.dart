@@ -36,6 +36,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: const Icon(
+          Icons.home_rounded,
+        ),
+        automaticallyImplyLeading: false,
+        title: const Text(
+          "Home",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -48,11 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 70,
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: _searchBox(),
-                    ),
+                    padding: const EdgeInsets.all(4.0),
+                    child: _searchBox(),
                   ),
                 ),
               ),
