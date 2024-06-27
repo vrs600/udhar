@@ -1,5 +1,5 @@
 name: udhar
-description: "An app for trust."
+description: "For Your Trust"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -78,6 +78,7 @@ dev_dependencies:
 flutter:
   assets:
     - lib/asset/image/undraw_people_search.svg
+    - lib/asset/image/ic_launcher.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
