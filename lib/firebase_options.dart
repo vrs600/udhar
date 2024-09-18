@@ -51,18 +51,23 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBJwOBS-IPWerXZrfFxNpjUejoilbfyChk',
-    appId: '1:1007664513257:android:25fe34001e7558f5d23078',
+    appId: '1:1007664513257:android:4f6f2803ba6089c2d23078',
     messagingSenderId: '1007664513257',
     projectId: 'udhar-de160',
+    databaseURL: 'https://udhar-de160-default-rtdb.firebaseio.com',
     storageBucket: 'udhar-de160.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAkH7gXw_7T4roqRi2VKjnXPdJeLZJT0q4',
-    appId: '1:1007664513257:ios:1eed2b87e73e0700d23078',
+    appId: '1:1007664513257:ios:b857a2153852d968d23078',
     messagingSenderId: '1007664513257',
     projectId: 'udhar-de160',
+    databaseURL: 'https://udhar-de160-default-rtdb.firebaseio.com',
     storageBucket: 'udhar-de160.appspot.com',
+    androidClientId: '1007664513257-a04onte16qsc5slvr6sfoo0j4pr2ur9r.apps.googleusercontent.com',
+    iosClientId: '1007664513257-csgko710q8a2je1pt9kjdsfvt32iv9mh.apps.googleusercontent.com',
     iosBundleId: 'com.android.udhar',
   );
+
 }

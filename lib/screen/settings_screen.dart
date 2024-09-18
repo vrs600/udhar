@@ -22,7 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _user = _auth.currentUser;
-    _currentUserPhoneNo = _user!.phoneNumber!;
+    _currentUserPhoneNo = _user!.email!;
     _phoneNoTEC.text = _currentUserPhoneNo;
   }
 
@@ -152,8 +152,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
       minLines: 1,
       decoration: _styling.getTFFInputDecoration(
-        label: "Your Phone No.",
-        prefixIcon: const Icon(Icons.phone_rounded),
+        label: "Email",
+        prefixIcon: const Icon(Icons.email_rounded),
       ),
     );
   }

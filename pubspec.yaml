@@ -77,8 +77,8 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - lib/asset/image/undraw_people_search.svg
-    - lib/asset/image/ic_launcher.png
+    - ./asset/image/undraw_people_search.svg
+    - ./asset/image/ic_launcher.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -90,21 +90,22 @@ flutter:
   fonts:
     - family: Poppins
       fonts:
-        - asset: ./lib/font/Poppins/Poppins-Black.ttf
-        - asset: ./lib/font/Poppins/Poppins-BlackItalic.ttf
-        - asset: ./lib/font/Poppins/Poppins-Bold.ttf
-        - asset: ./lib/font/Poppins/Poppins-BoldItalic.ttf
-        - asset: ./lib/font/Poppins/Poppins-ExtraBold.ttf
-        - asset: ./lib/font/Poppins/Poppins-ExtraBoldItalic.ttf
-        - asset: ./lib/font/Poppins/Poppins-ExtraLight.ttf
-        - asset: ./lib/font/Poppins/Poppins-ExtraLightItalic.ttf
-        - asset: ./lib/font/Poppins/Poppins-Italic.ttf
-        - asset: ./lib/font/Poppins/Poppins-Light.ttf
-        - asset: ./lib/font/Poppins/Poppins-LightItalic.ttf
-        - asset: ./lib/font/Poppins/Poppins-Medium.ttf
-        - asset: ./lib/font/Poppins/Poppins-MediumItalic.ttf
-        - asset: ./lib/font/Poppins/Poppins-Regular.ttf
-        - asset: ./lib/font/Poppins/Poppins-SemiBold.ttf
-        - asset: ./lib/font/Poppins/Poppins-SemiBoldItalic.ttf
-        - asset: ./lib/font/Poppins/Poppins-Thin.ttf
-        - asset: ./lib/font/Poppins/Poppins-ThinItalic.ttf
+        - asset: ./asset/font/Poppins/Poppins-Black.ttf
+        - asset: ./asset/font/Poppins/Poppins-Black.ttf
+        - asset: ./asset/font/Poppins/Poppins-BlackItalic.ttf
+        - asset: ./asset/font/Poppins/Poppins-Bold.ttf
+        - asset: ./asset/font/Poppins/Poppins-BoldItalic.ttf
+        - asset: ./asset/font/Poppins/Poppins-ExtraBold.ttf
+        - asset: ./asset/font/Poppins/Poppins-ExtraBoldItalic.ttf
+        - asset: ./asset/font/Poppins/Poppins-ExtraLight.ttf
+        - asset: ./asset/font/Poppins/Poppins-ExtraLightItalic.ttf
+        - asset: ./asset/font/Poppins/Poppins-Italic.ttf
+        - asset: ./asset/font/Poppins/Poppins-Light.ttf
+        - asset: ./asset/font/Poppins/Poppins-LightItalic.ttf
+        - asset: ./asset/font/Poppins/Poppins-Medium.ttf
+        - asset: ./asset/font/Poppins/Poppins-MediumItalic.ttf
+        - asset: ./asset/font/Poppins/Poppins-Regular.ttf
+        - asset: ./asset/font/Poppins/Poppins-SemiBold.ttf
+        - asset: ./asset/font/Poppins/Poppins-SemiBoldItalic.ttf
+        - asset: ./asset/font/Poppins/Poppins-Thin.ttf
+        - asset: ./asset/font/Poppins/Poppins-ThinItalic.ttf

@@ -10,13 +10,14 @@ class LoanModel {
   String status;
 
   LoanModel(
-      this.loanId,
-      this.borrowerMobileNo,
-      this.loanCreationDate,
-      this.loanCreationTime,
-      this.loanAmount,
-      this.lenderMobileNo,
-      this.dueDate,
-      this.note,
-      this.status);
+    this.loanId,
+    this.borrowerMobileNo,
+    this.loanCreationDate,
+    this.loanCreationTime,
+    this.loanAmount,
+    this.lenderMobileNo,
+    this.dueDate,
+    this.note,
+    this.status,
+  );
 }

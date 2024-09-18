@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/btm_nav_screen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -54,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image.asset("lib/asset/image/ic_launcher.png"),
+                child: Image.asset("./asset/image/ic_launcher.png"),
               ),
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -66,24 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: CountryCodePicker(
-              //     onChanged: (countryCode) {
-              //       if (kDebugMode) {
-              //         print("Country Code : ${countryCode.dialCode}");
-              //       }
-              //     },
-              //     // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-              //     initialSelection: 'IN',
-              //     // optional. Shows only country name and flag
-              //     showCountryOnly: false,
-              //     // optional. Shows only country name and flag when popup is closed.
-              //     showOnlyCountryWhenClosed: false,
-              //     // optional. aligns the flag and the Text left
-              //     alignLeft: false,
-              //   ),
-              // ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -104,6 +87,15 @@ class _LoginScreenState extends State<LoginScreen> {
               )
             ],
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          onPressed: () {
+            signInWithGoogle();
+          },
+          child: const Text("Continue with Google"),
         ),
       ),
     );
@@ -171,5 +163,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 builder: (context) => const BtmNavScreen(),
               ))
         });
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 }

@@ -209,6 +209,8 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
           setState(() {
             fillDummyValues();
           });
+
+          Navigator.pop(context);
         }
       });
     } else {
