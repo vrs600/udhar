@@ -23,7 +23,18 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _user = _auth.currentUser;
-
+    _auth.authStateChanges().listen(
+      (event) {
+        if (event != null) {
+          // user is logged in
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const BtmNavScreen(),
+            ),
+          );
+        }
+      },
+    );
     if (_user != null) {
       // user is logged in
       Navigator.of(context).push(

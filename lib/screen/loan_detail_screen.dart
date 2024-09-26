@@ -22,7 +22,6 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   final Styling _styling = Styling();
   final double _riskValue = 70;
   final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
-
   TextEditingController searchPeopleTEC = TextEditingController();
   bool _showProgressIndicator = true;
   final List<LoanModel> _loanModelList = [];
