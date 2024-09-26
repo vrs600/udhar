@@ -59,6 +59,7 @@ dependencies:
   twilio_flutter: ^0.3.0
   gauge_indicator: ^0.4.3
   easy_pie_chart: ^1.0.0
+  circular_profile_avatar: ^2.0.5
 
 dev_dependencies:
   flutter_test:

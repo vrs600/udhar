@@ -1,3 +1,4 @@
+import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:udhar/other/styling.dart';
@@ -18,6 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _phoneNoTEC = TextEditingController();
   User? _user;
   String _currentUserPhoneNo = "";
+
   @override
   void initState() {
     super.initState();
@@ -42,14 +44,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
-              height: 70,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: _searchBox(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircularProfileAvatar(
+                imageFit: BoxFit.cover,
+                radius: 70,
+                _user!.photoURL!.toString(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                _user!.displayName!.toString(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
                 ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: _searchBox(),
             ),
             Padding(
               padding: const EdgeInsets.all(2),

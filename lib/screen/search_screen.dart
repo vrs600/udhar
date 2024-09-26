@@ -113,6 +113,7 @@ class _SearchScreenState extends State<SearchScreen> {
               snapshot.child("loan_info").child("due_date").value.toString(),
               snapshot.child("loan_info").child("note").value.toString(),
               snapshot.child("loan_info").child("status").value.toString(),
+              snapshot.child("loan_info").child("lender_id").value.toString(),
             ),
           );
         }
@@ -255,6 +256,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 padding: const EdgeInsets.all(4),
                 child: TextFormField(
                   controller: _otpTEC,
+                  keyboardType: TextInputType.number,
                   decoration: styling.getTFFInputDecoration(
                     label: "OTP",
                     prefixIcon: const Icon(Icons.password_rounded),

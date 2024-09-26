@@ -205,13 +205,11 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
               dueDate: _dueDateTEC.text,
               note: _noteTEC.text)
           .then((isLoanCreated) {
-        if (isLoanCreated) {
-          setState(() {
-            fillDummyValues();
-          });
-
-          Navigator.pop(context);
-        }
+        Navigator.pop(context);
+        setState(() {
+          fillDummyValues();
+        });
+        if (isLoanCreated) {}
       });
     } else {
       // show appropriate message to the user
@@ -232,11 +230,10 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     if (value != null) {
       if (value.isEmpty) {
         return "Please enter mobile no.";
-      } else if (!RegExp(r"^\d+$").hasMatch(value)) {
-        return "Invalid mobile no.";
       } else {
         // send OTP to the entered mobile number
         // if the OTP gets validated then create the loan
+        return null;
       }
     }
   }

@@ -2,9 +2,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
+import 'package:readmore/readmore.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:easy_pie_chart/easy_pie_chart.dart';
+
+import 'loan_form_screen.dart';
 
 class LoanDetailScreen extends StatefulWidget {
   final LoanModel loan;
@@ -41,140 +44,292 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.loan.borrowerMobileNo),
+        title: Text(
+          widget.loan.borrowerMobileNo,
+        ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              "Loan Success Rate",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
+      body: ListView.builder(
+        itemCount: _loanModelList.length,
+        itemBuilder: (context, index) => Card(
+          child: ListTile(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoanFormScreen(_loanModelList[index]),
+                ),
+              );
+            },
+            title: Text(
+              _loanModelList[index].borrowerMobileNo,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "₹ ${_loanModelList[index].loanAmount} |  Due: ${_loanModelList[index].dueDate}",
+                      style: const TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                ReadMoreText(
+                  _loanModelList[index].note,
+                  trimMode: TrimMode.Line,
+                  trimLines: 2,
+                  colorClickableText: Colors.blueAccent,
+                  trimCollapsedText: 'Show more',
+                  trimExpandedText: 'Show less',
+                  moreStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: _getColor(index),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      _loanModelList[index].status,
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  _getColor(int index) {
+    if (_loanModelList[index].status == "pending") {
+      return Colors.redAccent;
+    }
+    if (_loanModelList[index].status == "completed") {
+      return Colors.green;
+    } else {
+      return Colors.blueAccent;
+    }
+  }
+
+  void _getLoanList() {
+    _loanModelList.clear();
+    _firebaseDatabase.ref("app/ledger").get().then((dataSnapshot) {
+      setState(() {
+        _showProgressIndicator = true;
+        for (DataSnapshot snapshot in dataSnapshot.children) {
+          if (kDebugMode) {
+            snapshot.value.toString();
+          }
+          print("\n======================\n");
+          print("\n${snapshot.value}\n");
+          print("\n======================\n");
+
+          print(
+              "INFORMATION ${snapshot.child("loan_info").child("borrower_mobile_no").value.toString()} : ${widget.loan.lenderId}");
+          if (snapshot
+                  .child("loan_info")
+                  .child("borrower_mobile_no")
+                  .value
+                  .toString() ==
+              widget.loan.borrowerMobileNo) {
+            _loanModelList.add(
+              LoanModel(
+                snapshot.child("loan_info").child("loan_id").value.toString(),
+                snapshot
+                    .child("loan_info")
+                    .child("borrower_mobile_no")
+                    .value
+                    .toString(),
+                snapshot
+                    .child("loan_info")
+                    .child("loan_creation_date")
+                    .value
+                    .toString(),
+                snapshot
+                    .child("loan_info")
+                    .child("loan_creation_time")
+                    .value
+                    .toString(),
+                double.parse(snapshot
+                    .child("loan_info")
+                    .child("loan_amount")
+                    .value
+                    .toString()),
+                snapshot
+                    .child("loan_info")
+                    .child("lender_mobile_no")
+                    .value
+                    .toString(),
+                snapshot.child("loan_info").child("due_date").value.toString(),
+                snapshot.child("loan_info").child("note").value.toString(),
+                snapshot.child("loan_info").child("status").value.toString(),
+                snapshot.child("loan_info").child("lender_id").value.toString(),
+              ),
+            );
+          }
+        }
+        _loanModelListCopy = _loanModelList;
+
+        _showProgressIndicator = false;
+      });
+    }).onError((error, stackTrace) {
+      setState(() {
+        _showProgressIndicator = false;
+      });
+
+      if (kDebugMode) {
+        print("Loan List Error: ${error.toString()}");
+      }
+    });
+  }
+
+  detailes() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            "Loan Success Rate",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
                           ),
-                          IconButton(
-                            onPressed: () => openRiskRateInfoBtmSheet(),
-                            icon: const Icon(Icons.info_outline_rounded),
-                          )
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: riskRateRadialGauge(),
-                      ),
-                    ],
-                  ),
+                        ),
+                        IconButton(
+                          onPressed: () => openRiskRateInfoBtmSheet(),
+                          icon: const Icon(Icons.info_outline_rounded),
+                        )
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: riskRateRadialGauge(),
+                    ),
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              "Loan Repayment",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            "Loan Repayment",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
                           ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.info_outline),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: EasyPieChart(
-                              pieType: PieType.crust,
-                              size: 150,
-                              centerText: "$_paidLoanPercentage%",
-                              children: [
-                                PieData(
-                                    value: _pendingLoanPercentage,
-                                    color: Colors.red),
-                                PieData(
-                                    value: _paidLoanPercentage,
-                                    color: Colors.blue),
-                              ],
-                            ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.info_outline),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: EasyPieChart(
+                            pieType: PieType.crust,
+                            size: 150,
+                            centerText: "$_paidLoanPercentage%",
                             children: [
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                              _styling.borderRadius),
-                                          color: Colors.redAccent),
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text("Pending Loan"),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                              _styling.borderRadius),
-                                          color: Colors.blueAccent),
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text("Paid Loan"),
-                                  )
-                                ],
-                              ),
+                              PieData(
+                                  value: _pendingLoanPercentage,
+                                  color: Colors.red),
+                              PieData(
+                                  value: _paidLoanPercentage,
+                                  color: Colors.blue),
                             ],
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                            _styling.borderRadius),
+                                        color: Colors.redAccent),
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text("Pending Loan"),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                            _styling.borderRadius),
+                                        color: Colors.blueAccent),
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text("Paid Loan"),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              )
-            ],
-          ),
-        ],
-      ),
+              ),
+            )
+          ],
+        ),
+      ],
     );
   }
 
@@ -253,82 +408,6 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
     } else {
       return Colors.green;
     }
-  }
-
-  void _getLoanList() {
-    _loanModelList.clear();
-    _firebaseDatabase.ref("app/ledger").get().then((dataSnapshot) {
-      setState(() {
-        _showProgressIndicator = true;
-        for (DataSnapshot snapshot in dataSnapshot.children) {
-          if (snapshot
-                  .child("loan_info")
-                  .child("borrower_mobile_no")
-                  .value
-                  .toString() ==
-              widget.loan.borrowerMobileNo) {
-            _loanModelList.add(
-              LoanModel(
-                snapshot.child("loan_info").child("loan_id").value.toString(),
-                snapshot
-                    .child("loan_info")
-                    .child("borrower_mobile_no")
-                    .value
-                    .toString(),
-                snapshot
-                    .child("loan_info")
-                    .child("loan_creation_date")
-                    .value
-                    .toString(),
-                snapshot
-                    .child("loan_info")
-                    .child("loan_creation_time")
-                    .value
-                    .toString(),
-                double.parse(snapshot
-                    .child("loan_info")
-                    .child("loan_amount")
-                    .value
-                    .toString()),
-                snapshot
-                    .child("loan_info")
-                    .child("lender_mobile_no")
-                    .value
-                    .toString(),
-                snapshot.child("loan_info").child("due_date").value.toString(),
-                snapshot.child("loan_info").child("note").value.toString(),
-                snapshot.child("loan_info").child("status").value.toString(),
-              ),
-            );
-          }
-        }
-        _loanModelListCopy = _loanModelList;
-
-        _showProgressIndicator = false;
-
-        _totalLoanCount = _loanModelList.length;
-        for (LoanModel loan in _loanModelList) {
-          if (loan.status == "pending") {
-            _pendingLoanCount++;
-          }
-
-          if (loan.status == "completed") {
-            _paidLoanCount++;
-          }
-        }
-
-        _pendingLoanPercentage = (_pendingLoanCount / _totalLoanCount) * 100;
-        _paidLoanPercentage = (_paidLoanCount / _totalLoanCount) * 100;
-      });
-    }).onError((error, stackTrace) {
-      setState(() {
-        _showProgressIndicator = false;
-      });
-
-      if (kDebugMode) {
-        print("Loan List Error: ${error.toString()}");
-      }
-    });
   }
 
   openRiskRateInfoBtmSheet() {

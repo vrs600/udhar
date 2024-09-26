@@ -8,6 +8,7 @@ class LoanModel {
   String dueDate;
   String note;
   String status;
+  String lenderId;
 
   LoanModel(
     this.loanId,
@@ -19,5 +20,6 @@ class LoanModel {
     this.dueDate,
     this.note,
     this.status,
+    this.lenderId,
   );
 }

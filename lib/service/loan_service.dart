@@ -9,12 +9,19 @@ import 'package:uuid/uuid.dart';
 
 class LoanService {
   String pending = "pending";
-
   String _loanId = "";
   String borrowerMobileNo;
   BuildContext context;
   final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final List<String> mobileNumbers = [
+    "+919876543210",
+    "+918765432109",
+    "+917654321098",
+    "+916543210987",
+    "+915432109876",
+  ];
 
   LoanService(this.borrowerMobileNo, this.context);
 
@@ -30,21 +37,22 @@ class LoanService {
     Uuid uuid = const Uuid();
     _loanId = uuid.v4();
     DateTime dateTime = DateTime.now();
-    String? currentUserMobileNumber = _auth.currentUser!.phoneNumber;
+    String? currentUserMobileNumber = _auth.currentUser!.email;
 
     LoanModel loanModel = LoanModel(
-        _loanId,
-        borrowerMobileNo,
-        "${dateTime.day.toString()}/${dateTime.month.toString()}/${dateTime.year.toString()}",
-        "${dateTime.hour.toString()}:${dateTime.minute.toString()}",
-        double.parse(loanAmount),
-        currentUserMobileNumber!,
-        dueDate,
-        note,
-        kDebugMode ? getLoanStatus() : pending);
+      _loanId,
+      borrowerMobileNo,
+      "${dateTime.day.toString()}/${dateTime.month.toString()}/${dateTime.year.toString()}",
+      "${dateTime.hour.toString()}:${dateTime.minute.toString()}",
+      double.parse(loanAmount),
+      currentUserMobileNumber!,
+      dueDate,
+      note,
+      kDebugMode ? getLoanStatus() : pending,
+      _auth.currentUser!.uid,
+    );
 
     if (_auth.currentUser != null) {
-      String? currentUserMobileNo = _auth.currentUser!.phoneNumber;
       DatabaseReference loanLedgerRef =
           _firebaseDatabase.ref("app/ledger/$_loanId/loan_info");
       loanLedgerRef.set({
@@ -53,10 +61,11 @@ class LoanService {
         "loan_creation_date": loanModel.loanCreationDate,
         "loan_creation_time": loanModel.loanCreationTime,
         "loan_amount": loanModel.loanAmount,
-        "lender_mobile_no": loanModel.lenderMobileNo,
+        "lender_email": loanModel.lenderMobileNo,
         "due_date": loanModel.dueDate,
         "note": loanModel.note,
         "status": loanModel.status,
+        "lender_id": _auth.currentUser!.uid,
       }).onError((error, stackTrace) {
         isLoanCreated = false;
 
@@ -66,7 +75,7 @@ class LoanService {
             title: const Text("Error"),
             content: Text(kDebugMode
                 ? error.toString()
-                : "Can't create your at this moment. Please try again later."),
+                : "Can't create your loan at this moment. Please try again later."),
             actions: [
               ElevatedButton.icon(
                 onPressed: () {},

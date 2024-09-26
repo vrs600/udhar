@@ -25,12 +25,28 @@ class _HomeScreenState extends State<HomeScreen> {
   final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _searchTEC = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  bool _showFloatingActionButton = true;
 
   @override
   void initState() {
     super.initState();
     _currentUserPhoneNo = _auth.currentUser!.phoneNumber;
     _getLoanList();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      setState(() {
+        _showFloatingActionButton = false;
+      });
+    } else {
+      setState(() {
+        _showFloatingActionButton = true;
+      });
+    }
   }
 
   @override
@@ -87,14 +103,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add_rounded),
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const LoanFormScreen(null),
-          ));
-        },
-      ),
+      floatingActionButton: _showFloatingActionButton
+          ? FloatingActionButton(
+              child: const Icon(Icons.add_rounded),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const LoanFormScreen(null),
+                ));
+              },
+            )
+          : null,
     );
   }
 
@@ -107,12 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
           if (kDebugMode) {
             snapshot.value.toString();
           }
-          if (snapshot
-                  .child("loan_info")
-                  .child("lender_mobile_no")
-                  .value
-                  .toString() ==
-              _currentUserPhoneNo) {
+          if (snapshot.child("loan_info").child("lender_id").value.toString() ==
+              _auth.currentUser!.uid) {
             _loanModelList.add(
               LoanModel(
                 snapshot.child("loan_info").child("loan_id").value.toString(),
@@ -144,6 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 snapshot.child("loan_info").child("due_date").value.toString(),
                 snapshot.child("loan_info").child("note").value.toString(),
                 snapshot.child("loan_info").child("status").value.toString(),
+                snapshot.child("loan_info").child("lender_id").value.toString(),
               ),
             );
           }

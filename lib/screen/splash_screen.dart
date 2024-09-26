@@ -22,18 +22,20 @@ class _SplashScreenState extends State<SplashScreen> {
       const Duration(seconds: 3),
     ).then((value) {
       if (_user == null) {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
             builder: (context) => const LoginScreen(),
           ),
+          (route) => false,
         );
       } else {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
             builder: (context) => const BtmNavScreen(),
           ),
+          (route) => false,
         );
       }
     });
@@ -49,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Image.asset("lib/asset/image/ic_launcher.png"),
+                  child: Image.asset("./asset/image/ic_launcher.png"),
                 ),
                 const Padding(
                   padding: EdgeInsets.all(8.0),

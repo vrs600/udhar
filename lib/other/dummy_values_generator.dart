@@ -2,18 +2,15 @@ import 'dart:math';
 
 class DummyValueGenerator {
   String generateRandomMobileNumber() {
-    String countryCode = "";
-    const List<String> operators = ["6", "7", "8", "9"];
-    // Select a random operator
-    final operator = operators[Random().nextInt(operators.length)];
-
-    // Generate random digits for the remaining 9 positions
-    final digits = List.generate(9, (index) => Random().nextInt(10).toString());
-
-    // Combine country code, operator, and random digits
-    final mobileNumber = "$countryCode$operator${digits.join("")}";
-
-    return mobileNumber;
+    final List<String> mobileNumbers = [
+      "+919876543210",
+      "+918765432109",
+      "+917654321098",
+      "+916543210987",
+      "+915432109876",
+    ];
+    int randomNumber = Random().nextInt(mobileNumbers.length - 1);
+    return mobileNumbers[randomNumber];
   }
 
   int generateRandomLoanInThousands() {
