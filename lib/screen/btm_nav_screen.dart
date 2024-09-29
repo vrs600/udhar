@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:udhar/screen/home_screen.dart';
 import 'package:udhar/screen/search_screen.dart';
 import 'package:udhar/screen/settings_screen.dart';
@@ -34,17 +35,17 @@ class _BtmNavScreenState extends State<BtmNavScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
+            icon: Icon(LucideIcons.home),
             label: 'Home',
             tooltip: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search_rounded),
+            icon: Icon(LucideIcons.search),
             label: 'Search',
             tooltip: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings_rounded),
+            icon: Icon(LucideIcons.settings),
             label: 'Settings',
             tooltip: 'Settings',
           ),

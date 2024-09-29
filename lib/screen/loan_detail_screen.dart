@@ -1,11 +1,16 @@
+import 'dart:ui';
+
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
+import 'package:lottie/lottie.dart';
 import 'package:readmore/readmore.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:easy_pie_chart/easy_pie_chart.dart';
+import 'package:udhar/service/loan_service.dart';
 
 import 'loan_form_screen.dart';
 
@@ -29,9 +34,8 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   int? chipSelectedIndex = 0;
   int _pendingLoanCount = 0;
   int _paidLoanCount = 0;
-  int _totalLoanCount = 0;
   double _paidLoanPercentage = 0;
-  double _pendingLoanPercentage = 0;
+  LottieBuilder? _riskAnimation;
 
   @override
   void initState() {
@@ -43,73 +47,132 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           widget.loan.borrowerMobileNo,
         ),
-      ),
-      body: ListView.builder(
-        itemCount: _loanModelList.length,
-        itemBuilder: (context, index) => Card(
-          child: ListTile(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LoanFormScreen(_loanModelList[index]),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: _riskAnimation,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(3),
                 ),
-              );
-            },
-            title: Text(
-              _loanModelList[index].borrowerMobileNo,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "RISK : ${((100 - _paidLoanPercentage).toString())}%",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ),
-            subtitle: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "₹ ${_loanModelList[index].loanAmount} |  Due: ${_loanModelList[index].dueDate}",
-                      style: const TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                ReadMoreText(
-                  _loanModelList[index].note,
-                  trimMode: TrimMode.Line,
-                  trimLines: 2,
-                  colorClickableText: Colors.blueAccent,
-                  trimCollapsedText: 'Show more',
-                  trimExpandedText: 'Show less',
-                  moreStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: _getColor(index),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      _loanModelList[index].status,
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: 200,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 3,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blueAccent,
+                        Colors.lightBlueAccent,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
                   ),
+                  child: _animatedRadioGauge(),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+          Flexible(
+            flex: 1,
+            child: ListView.builder(
+              itemCount: _loanModelList.length,
+              itemBuilder: (context, index) => Card(
+                child: ListTile(
+                  onTap: () {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) =>
+                    //         LoanFormScreen(_loanModelList[index]),
+                    //   ),
+                    // );
+                  },
+                  title: Text(
+                    _loanModelList[index].borrowerMobileNo,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            "₹ ${_loanModelList[index].loanAmount} |  Due: ${_loanModelList[index].dueDate}",
+                            style: const TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                      ReadMoreText(
+                        _loanModelList[index].note,
+                        trimMode: TrimMode.Line,
+                        trimLines: 2,
+                        colorClickableText: Colors.blueAccent,
+                        trimCollapsedText: 'Show more',
+                        trimExpandedText: 'Show less',
+                        moreStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: _getColor(index),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            _loanModelList[index].status,
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -126,6 +189,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   }
 
   void _getLoanList() {
+    String borrowerMobileNumber = "";
     _loanModelList.clear();
     _firebaseDatabase.ref("app/ledger").get().then((dataSnapshot) {
       setState(() {
@@ -133,19 +197,17 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         for (DataSnapshot snapshot in dataSnapshot.children) {
           if (kDebugMode) {
             snapshot.value.toString();
+            print("\n======================\n");
+            print("\n${snapshot.value}\n");
+            print("\n======================\n");
           }
-          print("\n======================\n");
-          print("\n${snapshot.value}\n");
-          print("\n======================\n");
+          borrowerMobileNumber = snapshot
+              .child("loan_info")
+              .child("borrower_mobile_no")
+              .value
+              .toString();
 
-          print(
-              "INFORMATION ${snapshot.child("loan_info").child("borrower_mobile_no").value.toString()} : ${widget.loan.lenderId}");
-          if (snapshot
-                  .child("loan_info")
-                  .child("borrower_mobile_no")
-                  .value
-                  .toString() ==
-              widget.loan.borrowerMobileNo) {
+          if (borrowerMobileNumber == widget.loan.borrowerMobileNo) {
             _loanModelList.add(
               LoanModel(
                 snapshot.child("loan_info").child("loan_id").value.toString(),
@@ -183,6 +245,28 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
           }
         }
         _loanModelListCopy = _loanModelList;
+        // calculating the total loan
+        for (LoanModel loanModel in _loanModelList) {
+          if (loanModel.status == LoanStatus.pending) {
+            _paidLoanCount += 1;
+          } else {
+            _pendingLoanCount += 1;
+          }
+        }
+
+        _paidLoanPercentage =
+            (_paidLoanCount / (_paidLoanCount + _pendingLoanCount)) * 100;
+
+        if (_paidLoanPercentage < 33.3) {
+          _riskAnimation =
+              Lottie.asset("./asset/animation/risk_animation.json");
+        } else if (_paidLoanPercentage > 33.3 && _paidLoanPercentage < 66.6) {
+          _riskAnimation =
+              Lottie.asset("./asset/animation/warning_animation.json");
+        } else {
+          _riskAnimation =
+              Lottie.asset("./asset/animation/done_animation.json");
+        }
 
         _showProgressIndicator = false;
       });
@@ -193,143 +277,9 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
 
       if (kDebugMode) {
         print("Loan List Error: ${error.toString()}");
+        print("Loan List stackTrace: ${stackTrace.toString()}");
       }
     });
-  }
-
-  detailes() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            "Loan Success Rate",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => openRiskRateInfoBtmSheet(),
-                          icon: const Icon(Icons.info_outline_rounded),
-                        )
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: riskRateRadialGauge(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            "Loan Repayment",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.info_outline),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: EasyPieChart(
-                            pieType: PieType.crust,
-                            size: 150,
-                            centerText: "$_paidLoanPercentage%",
-                            children: [
-                              PieData(
-                                  value: _pendingLoanPercentage,
-                                  color: Colors.red),
-                              PieData(
-                                  value: _paidLoanPercentage,
-                                  color: Colors.blue),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                            _styling.borderRadius),
-                                        color: Colors.redAccent),
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text("Pending Loan"),
-                                )
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                            _styling.borderRadius),
-                                        color: Colors.blueAccent),
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text("Paid Loan"),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
-      ],
-    );
   }
 
   getColor(LoanModel loanModel) {
@@ -341,62 +291,6 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
     } else {
       return Colors.blueAccent;
     }
-  }
-
-  riskRateRadialGauge() {
-    return AnimatedRadialGauge(
-      /// The animation duration.
-      duration: const Duration(seconds: 3),
-      curve: Curves.elasticOut,
-
-      /// Define the radius.
-      /// If you omit this value, the parent size will be used, if possible.
-      radius: 100,
-
-      /// Gauge value.
-      value: 70,
-
-      /// Optionally, you can configure your gauge, providing additional
-      /// styles and transformers.
-      axis: GaugeAxis(
-        /// Provide the [min] and [max] value for the [value] argument.
-        min: 0,
-        max: 100,
-
-        /// Render the gauge as a 180-degree arc.
-        degrees: 180,
-
-        /// Set the background color and axis thickness.
-        style: const GaugeAxisStyle(
-          thickness: 20,
-          background: Colors.transparent,
-          segmentSpacing: 4,
-        ),
-
-        /// Define the pointer that will indicate the progress (optional).
-        pointer: const GaugePointer.needle(
-          borderRadius: 16,
-          width: 20,
-          height: 100,
-          color: Colors.black,
-        ),
-
-        /// Define the progress bar (optional).
-        progressBar: const GaugeProgressBar.rounded(
-          color: Colors.blueAccent,
-        ),
-
-        /// Define axis segments (optional).
-        segments: [
-          GaugeSegment(
-            from: 0,
-            to: 100,
-            color: const Color(0xFFD9DEEB),
-            cornerRadius: Radius.circular(_styling.borderRadius),
-          ),
-        ],
-      ),
-    );
   }
 
   getGaugeProgressBarColor() {
@@ -447,6 +341,49 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  _animatedRadioGauge() {
+    return AnimatedRadialGauge(
+      duration: const Duration(seconds: 2),
+      curve: Curves.elasticOut,
+      radius: 100,
+      initialValue: 0,
+      value: _paidLoanPercentage,
+      axis: const GaugeAxis(
+        min: 0,
+        max: 100,
+        degrees: 180,
+        style: GaugeAxisStyle(
+          thickness: 20,
+          background: Color(0xFFDFE2EC),
+          segmentSpacing: 0,
+        ),
+        progressBar: GaugeProgressBar.rounded(
+          color: Colors.transparent,
+        ),
+        segments: [
+          GaugeSegment(
+            from: 0,
+            to: 33.3,
+            color: Colors.redAccent,
+            cornerRadius: Radius.circular(0),
+          ),
+          GaugeSegment(
+            from: 33.3,
+            to: 66.6,
+            color: Colors.deepOrangeAccent,
+            cornerRadius: Radius.circular(0),
+          ),
+          GaugeSegment(
+            from: 66.6,
+            to: 100,
+            color: Colors.green,
+            cornerRadius: Radius.circular(0),
+          ),
+        ],
       ),
     );
   }

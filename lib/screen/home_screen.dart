@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:readmore/readmore.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
@@ -54,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(
-          Icons.home_rounded,
+          LucideIcons.home,
         ),
         automaticallyImplyLeading: false,
         title: const Text(
@@ -76,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 70,
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(4.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: _searchBox(),
                   ),
                 ),
@@ -105,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: _showFloatingActionButton
           ? FloatingActionButton(
-              child: const Icon(Icons.add_rounded),
+              child: const Icon(LucideIcons.plus),
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const LoanFormScreen(null),
@@ -307,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
       minLines: 1,
       decoration: styling.getTFFInputDecoration(
         label: "Search",
-        prefixIcon: const Icon(Icons.search_rounded),
+        prefixIcon: const Icon(LucideIcons.search),
         textEditingController: _searchTEC,
       ),
     );

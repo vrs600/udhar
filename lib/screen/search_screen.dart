@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/loan_detail_screen.dart';
@@ -35,7 +36,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.search_rounded),
+        leading: const Icon(LucideIcons.search),
         automaticallyImplyLeading: false,
         title: const Text(
           "Search",
@@ -51,7 +52,7 @@ class _SearchScreenState extends State<SearchScreen> {
               height: 70,
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(4.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: _searchBox(),
                 ),
               ),
@@ -234,7 +235,7 @@ class _SearchScreenState extends State<SearchScreen> {
       decoration: styling.getTFFInputDecoration(
         label: "Search People by mobile no.",
         textEditingController: _searchPeopleTEC,
-        prefixIcon: const Icon(Icons.search_rounded),
+        prefixIcon: const Icon(LucideIcons.search),
       ),
     );
   }

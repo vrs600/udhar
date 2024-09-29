@@ -1,6 +1,7 @@
 import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/about_app_screen.dart';
 import 'package:udhar/screen/login_screen.dart';
@@ -32,7 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.settings_rounded),
+        leading: const Icon(LucideIcons.settings),
         automaticallyImplyLeading: false,
         title: const Text(
           "Settings",
@@ -64,7 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(4.0),
-              child: _searchBox(),
+              child: _emailTFF(),
             ),
             Padding(
               padding: const EdgeInsets.all(2),
@@ -73,7 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: IconButton(
                   onPressed: () {},
                   icon: const Icon(
-                    Icons.logout_rounded,
+                    LucideIcons.logOut,
                     color: Colors.black,
                   ),
                 ),
@@ -98,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                   icon: const Icon(
-                    Icons.info_outline_rounded,
+                    LucideIcons.info,
                     color: Colors.black,
                   ),
                 ),
@@ -158,7 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  _searchBox() {
+  _emailTFF() {
     return TextFormField(
       keyboardType: TextInputType.phone,
       controller: _phoneNoTEC,
@@ -168,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       minLines: 1,
       decoration: _styling.getTFFInputDecoration(
         label: "Email",
-        prefixIcon: const Icon(Icons.email_rounded),
+        prefixIcon: const Icon(LucideIcons.mail),
       ),
     );
   }

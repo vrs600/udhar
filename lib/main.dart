@@ -16,6 +16,9 @@ void main() async {
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: "Poppins",
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blueAccent,
+        ),
       ),
     ),
   );

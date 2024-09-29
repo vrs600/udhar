@@ -22,4 +22,19 @@ class LoanModel {
     this.status,
     this.lenderId,
   );
+
+  Map<String, dynamic> toMap() {
+    return {
+      "loan_id": loanId,
+      "borrower_mobile_no": borrowerMobileNo,
+      "loan_creation_date": loanCreationDate,
+      "loan_creation_time": loanCreationTime,
+      "loan_amount": loanAmount,
+      "lender_mobile_no": lenderMobileNo,
+      "due_date": dueDate,
+      "note": note,
+      "status": status,
+      "lender_id": lenderId,
+    };
+  }
 }

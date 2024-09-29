@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:uuid/uuid.dart';
 
+class LoanStatus {
+  static const String paid = "paid";
+  static const String pending = "completed";
+  static const String partiallyPaid = "completed";
+}
+
 class LoanService {
   String pending = "pending";
   String _loanId = "";
@@ -55,18 +61,7 @@ class LoanService {
     if (_auth.currentUser != null) {
       DatabaseReference loanLedgerRef =
           _firebaseDatabase.ref("app/ledger/$_loanId/loan_info");
-      loanLedgerRef.set({
-        "loan_id": loanModel.loanId,
-        "borrower_mobile_no": loanModel.borrowerMobileNo,
-        "loan_creation_date": loanModel.loanCreationDate,
-        "loan_creation_time": loanModel.loanCreationTime,
-        "loan_amount": loanModel.loanAmount,
-        "lender_email": loanModel.lenderMobileNo,
-        "due_date": loanModel.dueDate,
-        "note": loanModel.note,
-        "status": loanModel.status,
-        "lender_id": _auth.currentUser!.uid,
-      }).onError((error, stackTrace) {
+      loanLedgerRef.set(loanModel.toMap()).onError((error, stackTrace) {
         isLoanCreated = false;
 
         showDialog(
@@ -87,6 +82,11 @@ class LoanService {
         );
       }).then((value) {
         isLoanCreated = true;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Loan created"),
+          ),
+        );
         if (!kDebugMode) {
           showDialog(
             context: context,
@@ -117,9 +117,9 @@ class LoanService {
   getLoanStatus() {
     var randomNumber = Random().nextInt(10);
     if (randomNumber % 2 == 0) {
-      return "completed";
+      return LoanStatus.paid;
     } else {
-      return "pending";
+      return LoanStatus.pending;
     }
   }
 }

@@ -78,6 +78,14 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
+    # animation
+    - ./asset/animation/risk_animation.json
+    - ./asset/animation/empty_state_animation.json
+    - ./asset/animation/search_people_animation.json
+    - ./asset/animation/signup_animation.json
+    - ./asset/animation/done_animation.json
+    - ./asset/animation/warning_animation.json
+
     - ./asset/image/undraw_people_search.svg
     - ./asset/image/ic_launcher.png
 
@@ -85,8 +93,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
-
 
   fonts:
     - family: Poppins
