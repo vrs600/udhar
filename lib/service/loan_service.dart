@@ -5,21 +5,23 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:udhar/model/loan_model.dart';
+import 'package:udhar/other/styling.dart';
 import 'package:uuid/uuid.dart';
 
 class LoanStatus {
   static const String paid = "paid";
   static const String pending = "completed";
-  static const String partiallyPaid = "completed";
+  static const String partiallyPaid = "partially_paid";
 }
 
 class LoanService {
   String pending = "pending";
   String _loanId = "";
-  String borrowerMobileNo;
-  BuildContext context;
   final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  List<LoanModel> _loanModelList = [];
+  Styling styling = Styling();
+  int? chipSelectedIndex = 0;
 
   final List<String> mobileNumbers = [
     "+919876543210",
@@ -29,13 +31,12 @@ class LoanService {
     "+915432109876",
   ];
 
-  LoanService(this.borrowerMobileNo, this.context);
-
   Future<bool> createLoan({
     required String borrowerMobileNo,
     required String loanAmount,
     required String dueDate,
     required String note,
+    required BuildContext context,
   }) async {
     // todo : create loan
     // todo : OTP is remaining
@@ -121,5 +122,52 @@ class LoanService {
     } else {
       return LoanStatus.pending;
     }
+  }
+
+  Future<List<LoanModel>> getLoanList() async {
+    _loanModelList.clear();
+    DataSnapshot loanListSnapshot =
+        await _firebaseDatabase.ref("app/ledger").get();
+
+    for (DataSnapshot snapshot in loanListSnapshot.children) {
+      if (kDebugMode) {
+        snapshot.value.toString();
+      }
+      _loanModelList.add(
+        LoanModel(
+          snapshot.child("loan_info").child("loan_id").value.toString(),
+          snapshot
+              .child("loan_info")
+              .child("borrower_mobile_no")
+              .value
+              .toString(),
+          snapshot
+              .child("loan_info")
+              .child("loan_creation_date")
+              .value
+              .toString(),
+          snapshot
+              .child("loan_info")
+              .child("loan_creation_time")
+              .value
+              .toString(),
+          double.parse(snapshot
+              .child("loan_info")
+              .child("loan_amount")
+              .value
+              .toString()),
+          snapshot
+              .child("loan_info")
+              .child("lender_mobile_no")
+              .value
+              .toString(),
+          snapshot.child("loan_info").child("due_date").value.toString(),
+          snapshot.child("loan_info").child("note").value.toString(),
+          snapshot.child("loan_info").child("status").value.toString(),
+          snapshot.child("loan_info").child("lender_id").value.toString(),
+        ),
+      );
+    }
+    return _loanModelList;
   }
 }

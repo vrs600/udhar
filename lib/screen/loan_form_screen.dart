@@ -36,7 +36,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
       if (_loan == null) {
         fillDummyValues();
       } else {
-        _loanService = LoanService(_loan!.borrowerMobileNo, context);
+        _loanService = LoanService();
         fillLoanValues();
       }
     }
@@ -197,13 +197,15 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
   _validateForm() {
     if (_loanFormKey.currentState!.validate()) {
       // todo : create loan
-      LoanService loanService = LoanService(_mobileNoTEC.text, context);
+      LoanService loanService = LoanService();
       loanService
           .createLoan(
-              borrowerMobileNo: _mobileNoTEC.text,
-              loanAmount: _loanAmountTEC.text,
-              dueDate: _dueDateTEC.text,
-              note: _noteTEC.text)
+        borrowerMobileNo: _mobileNoTEC.text,
+        loanAmount: _loanAmountTEC.text,
+        dueDate: _dueDateTEC.text,
+        note: _noteTEC.text,
+        context: context,
+      )
           .then((isLoanCreated) {
         Navigator.pop(context);
         setState(() {

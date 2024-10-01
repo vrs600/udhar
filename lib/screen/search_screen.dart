@@ -152,12 +152,12 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Card(
           child: ListTile(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LoanFormScreen(_loanModelList[index]),
-                ),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => LoanFormScreen(_loanModelList[index]),
+              //   ),
+              // );
             },
             title: ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),

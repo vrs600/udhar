@@ -2,11 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:readmore/readmore.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/loan_form_screen.dart';
+import 'package:udhar/service/loan_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(
-          LucideIcons.home,
+          Icons.home_rounded,
         ),
         automaticallyImplyLeading: false,
         title: const Text(
@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 70,
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(4.0),
                     child: _searchBox(),
                   ),
                 ),
@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: _showFloatingActionButton
           ? FloatingActionButton(
-              child: const Icon(LucideIcons.plus),
+              child: const Icon(Icons.add_rounded),
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const LoanFormScreen(null),
@@ -118,65 +118,75 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _getLoanList() {
-    _loanModelList.clear();
-    _firebaseDatabase.ref("app/ledger").get().then((dataSnapshot) {
-      setState(() {
-        _showProgressIndicator = true;
-        for (DataSnapshot snapshot in dataSnapshot.children) {
-          if (kDebugMode) {
-            snapshot.value.toString();
-          }
-          if (snapshot.child("loan_info").child("lender_id").value.toString() ==
-              _auth.currentUser!.uid) {
-            _loanModelList.add(
-              LoanModel(
-                snapshot.child("loan_info").child("loan_id").value.toString(),
-                snapshot
-                    .child("loan_info")
-                    .child("borrower_mobile_no")
-                    .value
-                    .toString(),
-                snapshot
-                    .child("loan_info")
-                    .child("loan_creation_date")
-                    .value
-                    .toString(),
-                snapshot
-                    .child("loan_info")
-                    .child("loan_creation_time")
-                    .value
-                    .toString(),
-                double.parse(snapshot
-                    .child("loan_info")
-                    .child("loan_amount")
-                    .value
-                    .toString()),
-                snapshot
-                    .child("loan_info")
-                    .child("lender_mobile_no")
-                    .value
-                    .toString(),
-                snapshot.child("loan_info").child("due_date").value.toString(),
-                snapshot.child("loan_info").child("note").value.toString(),
-                snapshot.child("loan_info").child("status").value.toString(),
-                snapshot.child("loan_info").child("lender_id").value.toString(),
-              ),
-            );
-          }
-        }
-        _loanModelListCopy = _loanModelList;
+    LoanService service = LoanService();
 
-        _showProgressIndicator = false;
-      });
-    }).onError((error, stackTrace) {
-      setState(() {
-        _showProgressIndicator = false;
-      });
+    service.getLoanList().then(
+      (loanModelList) {
+        setState(() {
+          _loanModelList = loanModelList;
+        });
+      },
+    );
 
-      if (kDebugMode) {
-        print("Loan List Error: ${error.toString()}");
-      }
-    });
+    // _loanModelList.clear();
+    // _firebaseDatabase.ref("app/ledger").get().then((dataSnapshot) {
+    //   setState(() {
+    //     _showProgressIndicator = true;
+    //     for (DataSnapshot snapshot in dataSnapshot.children) {
+    //       if (kDebugMode) {
+    //         snapshot.value.toString();
+    //       }
+    //       if (snapshot.child("loan_info").child("lender_id").value.toString() ==
+    //           _auth.currentUser!.uid) {
+    //         _loanModelList.add(
+    //           LoanModel(
+    //             snapshot.child("loan_info").child("loan_id").value.toString(),
+    //             snapshot
+    //                 .child("loan_info")
+    //                 .child("borrower_mobile_no")
+    //                 .value
+    //                 .toString(),
+    //             snapshot
+    //                 .child("loan_info")
+    //                 .child("loan_creation_date")
+    //                 .value
+    //                 .toString(),
+    //             snapshot
+    //                 .child("loan_info")
+    //                 .child("loan_creation_time")
+    //                 .value
+    //                 .toString(),
+    //             double.parse(snapshot
+    //                 .child("loan_info")
+    //                 .child("loan_amount")
+    //                 .value
+    //                 .toString()),
+    //             snapshot
+    //                 .child("loan_info")
+    //                 .child("lender_mobile_no")
+    //                 .value
+    //                 .toString(),
+    //             snapshot.child("loan_info").child("due_date").value.toString(),
+    //             snapshot.child("loan_info").child("note").value.toString(),
+    //             snapshot.child("loan_info").child("status").value.toString(),
+    //             snapshot.child("loan_info").child("lender_id").value.toString(),
+    //           ),
+    //         );
+    //       }
+    //     }
+    //     _loanModelListCopy = _loanModelList;
+    //
+    //     _showProgressIndicator = false;
+    //   });
+    // }).onError((error, stackTrace) {
+    //   setState(() {
+    //     _showProgressIndicator = false;
+    //   });
+    //
+    //   if (kDebugMode) {
+    //     print("Loan List Error: ${error.toString()}");
+    //   }
+    // });
   }
 
   _getColor(int index) {
@@ -308,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
       minLines: 1,
       decoration: styling.getTFFInputDecoration(
         label: "Search",
-        prefixIcon: const Icon(LucideIcons.search),
+        prefixIcon: const Icon(Icons.search_rounded),
         textEditingController: _searchTEC,
       ),
     );
