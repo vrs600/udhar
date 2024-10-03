@@ -1,5 +1,7 @@
+import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/dummy_values_generator.dart';
 import 'package:udhar/other/styling.dart';
@@ -19,6 +21,8 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
   final TextEditingController _loanAmountTEC = TextEditingController();
   final TextEditingController _mobileNoTEC = TextEditingController();
   final TextEditingController _noteTEC = TextEditingController();
+  final TextEditingController _secreteKeyTEC = TextEditingController();
+  final TextEditingController _loanIdTEC = TextEditingController();
 
   final _loanFormKey = GlobalKey<FormState>();
   final Styling _styling = Styling();
@@ -31,6 +35,9 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
     super.initState();
     _loan = widget.loanModel;
     _editLoan = (_loan == null) ? false : true;
+    if (widget.loanModel != null) {
+      _loanIdTEC.text = _loan!.loanId;
+    }
     if (kDebugMode) {
       // entering dummy values in the text fields
       if (_loan == null) {
@@ -73,17 +80,26 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
               onPopInvoked: (didPop) {},
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: (_editLoan)
-                        ? Text(
-                            _loan!.loanId,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : null,
-                  ),
+                  (!_editLoan)
+                      ? Container()
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                              controller: _loanIdTEC,
+                              keyboardType: TextInputType.text,
+                              maxLines: null,
+                              readOnly: false,
+                              decoration: InputDecoration(
+                                filled: true,
+                                labelText: "Loan ID",
+                                prefixIcon: const Icon(LucideIcons.hash),
+                                fillColor: Colors.grey[300],
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              )),
+                        ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
@@ -93,7 +109,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       keyboardType: TextInputType.phone,
                       decoration: _styling.getTFFInputDecoration(
                         label: 'Borrower Mobile No.',
-                        prefixIcon: const Icon(Icons.phone_rounded),
+                        prefixIcon: const Icon(LucideIcons.phoneCall),
                       ),
                     ),
                   ),
@@ -105,7 +121,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       keyboardType: TextInputType.number,
                       decoration: _styling.getTFFInputDecoration(
                         label: 'Loan Amount',
-                        prefixIcon: const Icon(Icons.currency_rupee_rounded),
+                        prefixIcon: const Icon(LucideIcons.indianRupee),
                       ),
                     ),
                   ),
@@ -119,10 +135,63 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                       keyboardType: TextInputType.datetime,
                       decoration: _styling.getTFFInputDecoration(
                         label: 'Due Date',
-                        prefixIcon: const Icon(Icons.calendar_month_rounded),
+                        prefixIcon: const Icon(LucideIcons.calendar),
                       ),
                     ),
                   ),
+                  (_editLoan)
+                      ? Container()
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                              controller: _secreteKeyTEC,
+                              keyboardType: TextInputType.text,
+                              maxLines: null,
+                              validator: (value) {
+                                if (value == null) {
+                                  return "Please enter secret key of borrower";
+                                }
+                              },
+                              decoration: InputDecoration(
+                                filled: true,
+                                labelText: "Secret Key",
+                                prefixIcon: const Icon(LucideIcons.keyRound),
+                                fillColor: Colors.grey[300],
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return BottomSheet(
+                                          onClosing: () {},
+                                          builder: (context) {
+                                            return AiBarcodeScanner(
+                                              onDetect: (BarcodeCapture
+                                                  barcodeCapture) {
+                                                barcodeCapture
+                                                    .barcodes[0].displayValue;
+                                              },
+                                              onScan: (string) {
+                                                setState(() {
+                                                  _secreteKeyTEC.text = string;
+                                                });
+                                              },
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    LucideIcons.qrCode,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              )),
+                        ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
@@ -133,7 +202,7 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                         label: 'Note',
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -141,18 +210,30 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      (_loan!.status != LoanStatus.closed)
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ElevatedButton.icon(
+                                onPressed: () => _loanService!.closeLoan(
+                                  context: context,
+                                  loanId: _loan!.loanId,
+                                ),
+                                icon: const Icon(Icons.done_rounded),
+                                label: const Text("Close the Loan"),
+                              ),
+                            )
+                          : Container(),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton.icon(
-                          onPressed: () => _closeCurrentLoan(),
-                          icon: const Icon(Icons.done_rounded),
-                          label: const Text("Close"),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton.icon(
-                          onPressed: () => _validateForm(),
+                          onPressed: () => _loanService!.updateLoan(
+                            loanId: widget.loanModel!.loanId,
+                            updatedLoanAmount:
+                                double.parse(_loanAmountTEC.text),
+                            context: context,
+                            updatedNotes: _noteTEC.text,
+                            updatedLoanDate: _dueDateTEC.text,
+                          ),
                           icon: const Icon(Icons.edit_rounded),
                           label: const Text("Update"),
                         ),
@@ -275,7 +356,10 @@ class _LoanFormScreenState extends State<LoanFormScreen> {
           ),
           ElevatedButton.icon(
             onPressed: () {
-              _loanService!.closeLoan();
+              _loanService!.closeLoan(
+                loanId: widget.loanModel!.loanId,
+                context: context,
+              );
             },
             icon: const Icon(Icons.done_rounded),
             label: const Text("Yes"),

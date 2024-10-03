@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:readmore/readmore.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
@@ -17,22 +15,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<LoanModel> _loanModelList = [];
-  List<LoanModel> _loanModelListCopy = [];
+  final List<LoanModel> _loanModelListCopy = [];
   bool _showProgressIndicator = true;
   Styling styling = Styling();
   int? chipSelectedIndex = 0;
-  String? _currentUserPhoneNo = "";
   final List<String> _loanStatusList = ["all", "pending", "completed"];
-  final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _searchTEC = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _showFloatingActionButton = true;
+  final LoanService _service = LoanService();
 
   @override
   void initState() {
     super.initState();
-    _currentUserPhoneNo = _auth.currentUser!.phoneNumber;
     _getLoanList();
     _scrollController.addListener(_scrollListener);
   }
@@ -55,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(
-          Icons.home_rounded,
+          LucideIcons.home,
         ),
         automaticallyImplyLeading: false,
         title: const Text(
@@ -77,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 70,
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(4.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: _searchBox(),
                   ),
                 ),
@@ -118,84 +113,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _getLoanList() {
-    LoanService service = LoanService();
-
-    service.getLoanList().then(
+    _service.getLoanList().then(
       (loanModelList) {
         setState(() {
           _loanModelList = loanModelList;
+          _showProgressIndicator = false;
         });
       },
     );
-
-    // _loanModelList.clear();
-    // _firebaseDatabase.ref("app/ledger").get().then((dataSnapshot) {
-    //   setState(() {
-    //     _showProgressIndicator = true;
-    //     for (DataSnapshot snapshot in dataSnapshot.children) {
-    //       if (kDebugMode) {
-    //         snapshot.value.toString();
-    //       }
-    //       if (snapshot.child("loan_info").child("lender_id").value.toString() ==
-    //           _auth.currentUser!.uid) {
-    //         _loanModelList.add(
-    //           LoanModel(
-    //             snapshot.child("loan_info").child("loan_id").value.toString(),
-    //             snapshot
-    //                 .child("loan_info")
-    //                 .child("borrower_mobile_no")
-    //                 .value
-    //                 .toString(),
-    //             snapshot
-    //                 .child("loan_info")
-    //                 .child("loan_creation_date")
-    //                 .value
-    //                 .toString(),
-    //             snapshot
-    //                 .child("loan_info")
-    //                 .child("loan_creation_time")
-    //                 .value
-    //                 .toString(),
-    //             double.parse(snapshot
-    //                 .child("loan_info")
-    //                 .child("loan_amount")
-    //                 .value
-    //                 .toString()),
-    //             snapshot
-    //                 .child("loan_info")
-    //                 .child("lender_mobile_no")
-    //                 .value
-    //                 .toString(),
-    //             snapshot.child("loan_info").child("due_date").value.toString(),
-    //             snapshot.child("loan_info").child("note").value.toString(),
-    //             snapshot.child("loan_info").child("status").value.toString(),
-    //             snapshot.child("loan_info").child("lender_id").value.toString(),
-    //           ),
-    //         );
-    //       }
-    //     }
-    //     _loanModelListCopy = _loanModelList;
-    //
-    //     _showProgressIndicator = false;
-    //   });
-    // }).onError((error, stackTrace) {
-    //   setState(() {
-    //     _showProgressIndicator = false;
-    //   });
-    //
-    //   if (kDebugMode) {
-    //     print("Loan List Error: ${error.toString()}");
-    //   }
-    // });
   }
 
   _getColor(int index) {
-    if (_loanModelList[index].status == "pending") {
+    if (_loanModelList[index].status == LoanStatus.pending) {
       return Colors.redAccent;
     }
-    if (_loanModelList[index].status == "completed") {
+    if (_loanModelList[index].status == LoanStatus.paid) {
       return Colors.green;
+    }
+    if (_loanModelList[index].status == LoanStatus.partiallyPaid) {
+      return Colors.orange;
     } else {
+      // the loan is closed
       return Colors.blueAccent;
     }
   }
@@ -261,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     children: [
                       Text(
-                        "₹ ${_loanModelList[index].loanAmount} |  Due: ${_loanModelList[index].dueDate}",
+                        "₹ ${_loanModelList[index].loanAmount} |  Loan Date: ${_loanModelList[index].dueDate}",
                         style: const TextStyle(
                           color: Colors.black,
                         ),
@@ -318,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
       minLines: 1,
       decoration: styling.getTFFInputDecoration(
         label: "Search",
-        prefixIcon: const Icon(Icons.search_rounded),
+        prefixIcon: const Icon(LucideIcons.search),
         textEditingController: _searchTEC,
       ),
     );

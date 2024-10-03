@@ -115,6 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
               snapshot.child("loan_info").child("note").value.toString(),
               snapshot.child("loan_info").child("status").value.toString(),
               snapshot.child("loan_info").child("lender_id").value.toString(),
+              snapshot.child("loan_info").child("timestamp").value.toString(),
             ),
           );
         }

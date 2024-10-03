@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:udhar/model/user_model.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/btm_nav_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:udhar/service/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final Styling _styling = Styling();
   User? _user;
   String countryCode = "+91";
+  AuthService authService = AuthService();
 
   @override
   void initState() {
@@ -102,7 +107,30 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.all(8.0),
         child: ElevatedButton(
           onPressed: () {
-            signInWithGoogle();
+            authService.signInWithGoogle();
+
+            // signInWithGoogle().then(
+            //   (userCredential) {
+            //     User user = userCredential.user!;
+            //     UserModel userModel = UserModel(
+            //       user.uid,
+            //       user.displayName!,
+            //       user.email!,
+            //       user.photoURL!,
+            //     );
+            //
+            //     FirebaseDatabase.instance
+            //         .ref("app/user/${user.uid}/personal_info/")
+            //         .update(userModel.toMap())
+            //         .then(
+            //       (value) {
+            //         if (kDebugMode) {
+            //           print("USER DATA UPDATED");
+            //         }
+            //       },
+            //     );
+            //   },
+            // );
           },
           child: const Text("Continue with Google"),
         ),

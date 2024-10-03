@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
@@ -9,10 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'package:readmore/readmore.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
-import 'package:easy_pie_chart/easy_pie_chart.dart';
 import 'package:udhar/service/loan_service.dart';
-
-import 'loan_form_screen.dart';
 
 class LoanDetailScreen extends StatefulWidget {
   final LoanModel loan;
@@ -34,6 +28,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   int? chipSelectedIndex = 0;
   int _pendingLoanCount = 0;
   int _paidLoanCount = 0;
+  int _paritialPaidLoanCount = 0;
   double _paidLoanPercentage = 0;
   LottieBuilder? _riskAnimation;
 
@@ -240,6 +235,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
                 snapshot.child("loan_info").child("note").value.toString(),
                 snapshot.child("loan_info").child("status").value.toString(),
                 snapshot.child("loan_info").child("lender_id").value.toString(),
+                snapshot.child("loan_info").child("timestamp").value.toString(),
               ),
             );
           }
@@ -248,9 +244,12 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
         // calculating the total loan
         for (LoanModel loanModel in _loanModelList) {
           if (loanModel.status == LoanStatus.pending) {
-            _paidLoanCount += 1;
-          } else {
             _pendingLoanCount += 1;
+          }
+          if (loanModel.status == LoanStatus.paid ||
+              loanModel.status == LoanStatus.closed ||
+              loanModel.status == LoanStatus.partiallyPaid) {
+            _paidLoanCount += 1;
           }
         }
 
@@ -288,6 +287,9 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
     }
     if (widget.loan.status == "completed") {
       return Colors.green;
+    }
+    if (widget.loan.status == LoanStatus.partiallyPaid) {
+      return Colors.orange;
     } else {
       return Colors.blueAccent;
     }

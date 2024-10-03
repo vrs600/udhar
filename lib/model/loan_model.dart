@@ -9,6 +9,7 @@ class LoanModel {
   String note;
   String status;
   String lenderId;
+  String timestamp;
 
   LoanModel(
     this.loanId,
@@ -21,6 +22,7 @@ class LoanModel {
     this.note,
     this.status,
     this.lenderId,
+    this.timestamp,
   );
 
   Map<String, dynamic> toMap() {
@@ -31,10 +33,11 @@ class LoanModel {
       "loan_creation_time": loanCreationTime,
       "loan_amount": loanAmount,
       "lender_mobile_no": lenderMobileNo,
-      "due_date": dueDate,
+      "loan_date": dueDate,
       "note": note,
       "status": status,
       "lender_id": lenderId,
+      "timestamp": timestamp,
     };
   }
 }

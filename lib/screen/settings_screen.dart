@@ -2,8 +2,10 @@ import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:udhar/screen/about_app_screen.dart';
+import 'package:udhar/screen/loan_key_screen.dart';
 import 'package:udhar/screen/login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -64,8 +66,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(8.0),
               child: _emailTFF(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(2),
+              child: ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoanKeyScreen(),
+                    ),
+                  );
+                },
+                leading: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    LucideIcons.keyRound,
+                    color: Colors.black,
+                  ),
+                ),
+                title: const Text(
+                  "View My Secret Key",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text("For loan authentication"),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(2),

@@ -4,14 +4,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:udhar/model/loan_model.dart';
 import 'package:udhar/other/styling.dart';
 import 'package:uuid/uuid.dart';
 
 class LoanStatus {
   static const String paid = "paid";
-  static const String pending = "completed";
+  static const String pending = "pending";
   static const String partiallyPaid = "partially_paid";
+  static const String closed = "closed";
 }
 
 class LoanService {
@@ -22,7 +24,8 @@ class LoanService {
   List<LoanModel> _loanModelList = [];
   Styling styling = Styling();
   int? chipSelectedIndex = 0;
-
+  Uuid uuid = const Uuid();
+  DatabaseReference _reference = FirebaseDatabase.instance.ref();
   final List<String> mobileNumbers = [
     "+919876543210",
     "+918765432109",
@@ -31,6 +34,8 @@ class LoanService {
     "+915432109876",
   ];
 
+  LoanService() {}
+
   Future<bool> createLoan({
     required String borrowerMobileNo,
     required String loanAmount,
@@ -38,10 +43,9 @@ class LoanService {
     required String note,
     required BuildContext context,
   }) async {
-    // todo : create loan
-    // todo : OTP is remaining
+    int timestamp = DateTime.now().millisecondsSinceEpoch;
     bool isLoanCreated = false;
-    Uuid uuid = const Uuid();
+
     _loanId = uuid.v4();
     DateTime dateTime = DateTime.now();
     String? currentUserMobileNumber = _auth.currentUser!.email;
@@ -55,8 +59,9 @@ class LoanService {
       currentUserMobileNumber!,
       dueDate,
       note,
-      kDebugMode ? getLoanStatus() : pending,
+      kDebugMode ? getLoanStatus() : LoanStatus.pending,
       _auth.currentUser!.uid,
+      timestamp.toString(),
     );
 
     if (_auth.currentUser != null) {
@@ -83,9 +88,19 @@ class LoanService {
         );
       }).then((value) {
         isLoanCreated = true;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Loan created"),
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Loan Created"),
+            content: Text("Your loan is recorded with ID: ${loanModel.loanId}"),
+            actions: [
+              ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.done_rounded),
+                  label: const Text("Okay"))
+            ],
           ),
         );
         if (!kDebugMode) {
@@ -97,11 +112,12 @@ class LoanService {
                   Text("Your loan is recorded with ID: ${loanModel.loanId}"),
               actions: [
                 ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.done_rounded),
-                    label: const Text("Okay"))
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.done_rounded),
+                  label: const Text("Okay"),
+                )
               ],
             ),
           );
@@ -111,14 +127,65 @@ class LoanService {
     return isLoanCreated;
   }
 
-  closeLoan() {
-    // todo : close loan
+  closeLoan({
+    required String loanId,
+    required BuildContext context,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Close Loan"),
+        content: const Text("Are you sure that you want to close the loan?"),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _firebaseDatabase.ref("app/ledger/$loanId/loan_info").update({
+                "loan_amount": 0,
+                "status": LoanStatus.closed,
+              }).then(
+                (value) {
+                  if (kDebugMode) {
+                    print("[updateLoan] : LOAN AMOUNT UPDATED");
+                  }
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      icon:
+                          Lottie.asset("./asset/animation/done_animation.json"),
+                      title: const Text("Loan Closed"),
+                      content: const Text("Selected loan closed successfully"),
+                      actions: [
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(Icons.done_rounded),
+                          label: const Text("Okay"),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: const Text("Yes"),
+          )
+        ],
+      ),
+    );
   }
 
   getLoanStatus() {
     var randomNumber = Random().nextInt(10);
     if (randomNumber % 2 == 0) {
-      return LoanStatus.paid;
+      return LoanStatus.partiallyPaid;
     } else {
       return LoanStatus.pending;
     }
@@ -161,13 +228,106 @@ class LoanService {
               .child("lender_mobile_no")
               .value
               .toString(),
-          snapshot.child("loan_info").child("due_date").value.toString(),
+          snapshot.child("loan_info").child("loan_date").value.toString(),
           snapshot.child("loan_info").child("note").value.toString(),
           snapshot.child("loan_info").child("status").value.toString(),
           snapshot.child("loan_info").child("lender_id").value.toString(),
+          snapshot.child("loan_info").child("timestamp").value.toString(),
         ),
       );
     }
     return _loanModelList;
+  }
+
+  Future<String> getCurrentUserSecreteKey() async {
+    DataSnapshot snapshot = await _firebaseDatabase
+        .ref("app/user/${_auth.currentUser!.uid}/personal_info/")
+        .get();
+
+    if (kDebugMode) {
+      print("getCurrentUserSecreteKey() : ${snapshot.value.toString()}");
+    }
+
+    String secreteKey = snapshot.child("secrete_key").value.toString();
+    return secreteKey;
+  }
+
+  Future<void> updateSecreteKey() async {
+    String secreteKey = generateSecreteKey();
+    _firebaseDatabase
+        .ref("app/user/${_auth.currentUser!.uid}/personal_info/")
+        .update({
+      "secrete_key": secreteKey,
+    });
+  }
+
+  String generateSecreteKey() {
+    String chars =
+        '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    Random random = Random.secure();
+    return List.generate(6, (index) => chars[random.nextInt(chars.length)])
+        .join();
+  }
+
+  void updateLoan({
+    required String loanId,
+    required double updatedLoanAmount,
+    required String updatedNotes,
+    required String updatedLoanDate,
+    required BuildContext context,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Update Loan"),
+        content: const Text("Are you sure that you want to update the loan?"),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                _reference =
+                    _firebaseDatabase.ref("app/ledger/$loanId/loan_info");
+                _reference.update({
+                  "loan_amount": updatedLoanAmount,
+                  "loan_date": updatedLoanDate,
+                  "note": updatedNotes,
+                  "status": (updatedLoanAmount == 0)
+                      ? LoanStatus.paid
+                      : LoanStatus.pending,
+                }).then(
+                  (value) {
+                    Navigator.pop(context);
+                    if (kDebugMode) {
+                      print("[updateLoan] : LOAN AMOUNT UPDATED");
+                    }
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Loan Updated"),
+                        content:
+                            const Text("Your loan are updated successfully"),
+                        actions: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(Icons.done_rounded),
+                            label: const Text("Okay"),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              child: const Text("Yes")),
+        ],
+      ),
+    );
   }
 }
