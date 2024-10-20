@@ -28,7 +28,6 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   int? chipSelectedIndex = 0;
   int _pendingLoanCount = 0;
   int _paidLoanCount = 0;
-  int _paritialPaidLoanCount = 0;
   double _paidLoanPercentage = 0;
   LottieBuilder? _riskAnimation;
 
@@ -247,8 +246,8 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
             _pendingLoanCount += 1;
           }
           if (loanModel.status == LoanStatus.paid ||
-              loanModel.status == LoanStatus.closed ||
-              loanModel.status == LoanStatus.partiallyPaid) {
+              loanModel.status == LoanStatus.completed
+          ) {
             _paidLoanCount += 1;
           }
         }

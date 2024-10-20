@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<LoanModel> _loanModelList = [];
-  final List<LoanModel> _loanModelListCopy = [];
+  List<LoanModel> _loanModelListCopy = [];
   bool _showProgressIndicator = true;
   Styling styling = Styling();
   int? chipSelectedIndex = 0;
@@ -117,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
       (loanModelList) {
         setState(() {
           _loanModelList = loanModelList;
+          _loanModelListCopy = _loanModelList;
           _showProgressIndicator = false;
         });
       },
@@ -149,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
             selected: chipSelectedIndex == index,
             onSelected: (bool selected) {
               setState(() {
+                _loanModelList = _loanModelListCopy;
                 chipSelectedIndex = selected ? index : null;
 
                 if (chipSelectedIndex == 0) {
@@ -159,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }).toList();
                 } else if (chipSelectedIndex == 2) {
                   _loanModelList = _loanModelListCopy.where((loanItem) {
-                    return loanItem.status == "completed";
+                    return loanItem.status == LoanStatus.completed || loanItem.status == LoanStatus.closed;
                   }).toList();
                 }
               });

@@ -153,12 +153,12 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Card(
           child: ListTile(
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => LoanFormScreen(_loanModelList[index]),
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoanFormScreen(_loanModelList[index]),
+                ),
+              );
             },
             title: ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
@@ -242,58 +242,60 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   _onViewReportButtonClicked(int index) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("OTP Verification"),
-        content: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(4),
-                child: Text(
-                    "Enter the OTP  sent to ${_loanModelList[index].borrowerMobileNo} to get permission to view full report"),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(4),
-                child: TextFormField(
-                  controller: _otpTEC,
-                  keyboardType: TextInputType.number,
-                  decoration: styling.getTFFInputDecoration(
-                    label: "OTP",
-                    prefixIcon: const Icon(Icons.password_rounded),
-                    textEditingController: _otpTEC,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (kDebugMode) {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoanDetailScreen(
-                      _loanModelList[index],
-                    ),
-                  ),
-                );
-              }
-            },
-            child: const Text("Verify"),
-          )
-        ],
-      ),
-    );
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => LoanDetailScreen(_loanModelList[index]),));
+    // showDialog(
+    //   context: context,
+    //   builder: (context) => AlertDialog(
+    //     title: const Text("OTP Verification"),
+    //     content: SingleChildScrollView(
+    //       child: Column(
+    //         children: [
+    //           Padding(
+    //             padding: const EdgeInsets.all(4),
+    //             child: Text(
+    //                 "Enter the OTP  sent to ${_loanModelList[index].borrowerMobileNo} to get permission to view full report"),
+    //           ),
+    //           Padding(
+    //             padding: const EdgeInsets.all(4),
+    //             child: TextFormField(
+    //               controller: _otpTEC,
+    //               keyboardType: TextInputType.number,
+    //               decoration: styling.getTFFInputDecoration(
+    //                 label: "OTP",
+    //                 prefixIcon: const Icon(Icons.password_rounded),
+    //                 textEditingController: _otpTEC,
+    //               ),
+    //             ),
+    //           )
+    //         ],
+    //       ),
+    //     ),
+    //     actions: [
+    //       ElevatedButton(
+    //         onPressed: () {
+    //           Navigator.pop(context);
+    //         },
+    //         child: const Text("Cancel"),
+    //       ),
+    //       ElevatedButton(
+    //         onPressed: () {
+    //           if (kDebugMode) {
+    //             Navigator.pop(context);
+    //             Navigator.push(
+    //               context,
+    //               MaterialPageRoute(
+    //                 builder: (context) => LoanDetailScreen(
+    //                   _loanModelList[index],
+    //                 ),
+    //               ),
+    //             );
+    //           }
+    //         },
+    //         child: const Text("Verify"),
+    //       )
+    //     ],
+    //   ),
+    // );
   }
 }

@@ -14,6 +14,7 @@ class LoanStatus {
   static const String pending = "pending";
   static const String partiallyPaid = "partially_paid";
   static const String closed = "closed";
+  static const String completed = "completed";
 }
 
 class LoanService {
@@ -59,7 +60,7 @@ class LoanService {
       currentUserMobileNumber!,
       dueDate,
       note,
-      kDebugMode ? getLoanStatus() : LoanStatus.pending,
+      LoanStatus.pending,
       _auth.currentUser!.uid,
       timestamp.toString(),
     );
@@ -148,7 +149,7 @@ class LoanService {
               Navigator.pop(context);
               _firebaseDatabase.ref("app/ledger/$loanId/loan_info").update({
                 "loan_amount": 0,
-                "status": LoanStatus.closed,
+                "status": LoanStatus.completed,
               }).then(
                 (value) {
                   if (kDebugMode) {
@@ -185,7 +186,7 @@ class LoanService {
   getLoanStatus() {
     var randomNumber = Random().nextInt(10);
     if (randomNumber % 2 == 0) {
-      return LoanStatus.partiallyPaid;
+      return LoanStatus.paid;
     } else {
       return LoanStatus.pending;
     }
